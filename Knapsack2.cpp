@@ -24,7 +24,8 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length);
 
 vector<int> readCoeffs(ifstream &file, string fileName);
 
-//Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, TabuList& tabuList);
+Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, 
+    TabuList& tabuList, vector<vector<int>> pairs);
 
 
 
@@ -82,6 +83,7 @@ int main()
     Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C);
 
     Solution Sol(numVars);
+    vector<vector<int>> pairList = Sol.createPairList();
    
     //Prob.printAk();
     //Prob.printC();
@@ -135,6 +137,25 @@ int main()
 
     Tabu.insertTabu(Sol);
     cout << Tabu.checkTabu(Sol) << endl;
+
+    auto start4 = chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < 10000; i++)
+        Tabu.checkTabu(Sol);
+
+    auto finish4 = chrono::high_resolution_clock::now();
+    auto ticks4 = chrono::duration_cast<chrono::microseconds>(finish4 - start4);
+    double result4 = ticks4.count() / 1000000.0;
+    cout << endl << "checking Tabu List: time in seconds: " << result4 << endl;
+
+    auto start5 = chrono::high_resolution_clock::now();
+
+    exploreSpaces(Sol, Prob, Tabu, pairList);
+
+    auto finish5 = chrono::high_resolution_clock::now();
+    auto ticks5 = chrono::duration_cast<chrono::microseconds>(finish5 - start5);
+    double result5 = ticks5.count() / 1000000.0;
+    cout << endl << "1 explore space: time in seconds: " << result5 << endl;
 
     cout << endl << "RHS rows: " << Bk1.size() << endl;
     cout << endl << "LHS cols: " << Ak1[0].size() << endl;
@@ -208,19 +229,39 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
     return temp;
 }
 
-/*
-Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, TabuList& tabuList) {
-    Solution init = solution;
-    Solution best();
-    tabuList.insertTabu(solution);
-    int len = solution.getLength();
-    for (int i = 0; i < len; i++) {
-        solution.flipBit(solution.getXval(i));
-
+Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> pairs) {
+    // Solution Init(solutionSize);
+    // Init = Sol;
+    int size = Sol.getLength();
+    Solution Best(size);
+    Best.clearSolution();
+    // tList.insertTabu(Init);
+    for (int i = 0; i < size; i++) {
+        Sol.flipBit(i);
+        if (!tList.checkTabu(Sol)) {
+            Sol.violAmounts(coeffs);
+            Best.violAmounts(coeffs);
+            if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
+                Best = Sol;
+        }
+        Sol.flipBit(i);
     }
-
+    for (int i = 0; i < pairs.size(); i++) {
+        Sol.swapBit(pairs[i]);
+        if (!tList.checkTabu(Sol)) {
+            Sol.violAmounts(coeffs);
+            Best.violAmounts(coeffs);
+            if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
+                Best = Sol;
+        }
+        Sol.swapBit(pairs[i]);
+    }
+    return Best;
 }
-*/
+
+
+
+
 
 //--------------------------------------------------------------------------
 

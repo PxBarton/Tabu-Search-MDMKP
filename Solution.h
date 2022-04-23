@@ -91,7 +91,7 @@ private:
 
 	valarray<int> xItems;
 
-	vector<vector<int>> pairList; 
+	// vector<vector<int>> pairList; 
 
 	vector<int> violations; 
 
@@ -140,7 +140,7 @@ vector<vector<int>> Solution::createPairList() {
 			}
 		}
 	}
-	cout << endl << numPairs << endl;
+	//cout << endl << numPairs << endl;
 	
 	for (int i = 0; i < pList.size(); i++) {
 		for (int j = 0; j < pList.size(); j++) {
@@ -153,7 +153,9 @@ vector<vector<int>> Solution::createPairList() {
     for (int i = 0; i < pList.size(); i++)
 		cout << pList[i][0] << ' ' << pList[i][1] << endl;
     */
-	cout << pList.size() << endl << endl;
+	//cout << pList.size() << endl << endl;
+
+	// pairList = pList;
 	return pList;
 }
 
