@@ -91,6 +91,7 @@ private:
 
 	valarray<int> xItems;
 
+
 	// vector<vector<int>> pairList; 
 
 	vector<int> violations; 
@@ -100,6 +101,8 @@ private:
 	bool feasible = 0;
 
 	int zScore = 0;
+
+	int fitness = 0;
 
 
 };
@@ -215,7 +218,8 @@ int Solution::calcZ(ProblemCoefficients& coeff) {
 }
 
 int Solution::evalFit(ProblemCoefficients& coeff) {
-	return (this->calcZ(coeff) - penalty);
+	fitness = this->calcZ(coeff) - penalty;
+	return fitness;
 }
 
 bool Solution::isFeasible() {

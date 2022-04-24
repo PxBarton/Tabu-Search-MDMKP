@@ -170,7 +170,7 @@ int main()
             cout << Ak1[i][j] << ' ';
         cout << endl;
     }
-    */
+    
 
     for (int i = 0; i < Bk1.size(); i++)
         cout << Bk1[i] << ' ';
@@ -181,6 +181,54 @@ int main()
     Sol.printSolution();
     Sol2 = Sol;
     Sol2.printSolution();
+    */
+
+    /////////////////////////////////////////////////
+    // Tabu search Algorithm 
+
+    Solution Init(numVars);
+    Init.generate();
+
+    Solution bestSol = Init;
+    Solution nextSol = Init;
+    Solution bestFeas = Init;
+    Tabu.insertTabu(bestSol);
+    Tabu.insertTabu(nextSol);
+    int count = 0;
+
+    while (count < 100) {
+        Solution newSol = exploreSpaces(nextSol, Prob, Tabu, pairList);
+        newSol.violAmounts(Prob);
+        bestSol.violAmounts(Prob);
+        if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
+            if (!Tabu.checkTabu(newSol)) {
+                bestSol = newSol;
+                nextSol = newSol;
+                if (newSol.isFeasible())
+                    bestFeas = newSol;
+                Tabu.insertTabu(newSol);
+                cout << "improve  " << newSol.getZ() << "  " << newSol.evalFit(Prob);
+            }
+        }
+        else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
+            if (!Tabu.checkTabu(newSol)) {
+                nextSol = newSol;
+                Tabu.insertTabu(newSol);
+            }
+            else
+                break;
+            cout << "no improve" << newSol.getZ() << "  " << newSol.evalFit(Prob);
+        }
+        cout << count << endl;
+        count++;
+
+    }
+    cout << "best Z: " << bestSol.getZ() << endl;
+    if (!bestFeas.isFeasible())
+        cout << "best feasible Z: " << bestFeas.getZ() << endl;
+    else
+        cout << "no feasible solution found" << endl;
+
 }
 
 //------------------------------------------------------------------------------
@@ -259,7 +307,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
         }
         Sol.swapBit(pairs[i]);
     }
-    
+    /*
     auto start = chrono::high_resolution_clock::now();
 
     Sol.swapBit(pairs[5]);
@@ -294,7 +342,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
     double result2 = ticks2.count() / 1000000.0;
     cout << endl << "all swaps and checks: time in seconds: " << result2 << endl;
-
+    */
     return Best;
 }
 
