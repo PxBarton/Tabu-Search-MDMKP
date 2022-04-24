@@ -144,3 +144,4 @@ void ProblemCoefficients::printAd() {
 		cout << endl;
 		cout << endl;
 	}
+}

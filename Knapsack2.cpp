@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 20;
+    int numRowsK = 6;
 
-    int numRowsD = 10;
+    int numRowsD = 4;
 
     ifstream inf;
 
@@ -84,12 +84,15 @@ int main()
 
     Solution Sol(numVars);
     vector<vector<int>> pairList = Sol.createPairList();
-    cout << "no. pairs: " << pairList.size() << endl;
-   
+    cout << "no. pairs: " << pairList.size() << endl << endl;
+    
+    cout << "Knapsack LHS --------------------------------" << endl << endl;
     Prob.printAk();
+    cout << "Demand LHS ----------------------------------" << endl << endl;
     Prob.printAd();
-    //Prob.printC();
-    //cout << endl;
+    cout << "Objective Function Coeffs -------------------" << endl << endl;
+    Prob.printC();
+    cout << endl;
 
     Sol.generate();
     Sol.printSolution();
