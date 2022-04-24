@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 15;
+    int numRowsK = 30;
 
-    int numRowsD = 0;
+    int numRowsD = 30;
 
     ifstream inf;
 
