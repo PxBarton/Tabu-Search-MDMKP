@@ -84,6 +84,7 @@ int main()
 
     Solution Sol(numVars);
     vector<vector<int>> pairList = Sol.createPairList();
+    cout << "no. pairs: " << pairList.size() << endl;
    
     //Prob.printAk();
     //Prob.printC();
@@ -98,7 +99,7 @@ int main()
     auto start = chrono::high_resolution_clock::now();
 
     int i = 0;
-    while (i < 100000) {
+    while (i < 200) {
         Sol.calcZ(Prob);
         i++;
     }
@@ -147,7 +148,7 @@ int main()
     auto ticks4 = chrono::duration_cast<chrono::microseconds>(finish4 - start4);
     double result4 = ticks4.count() / 1000000.0;
     cout << endl << "checking Tabu List: time in seconds: " << result4 << endl;
-
+    
     auto start5 = chrono::high_resolution_clock::now();
 
     exploreSpaces(Sol, Prob, Tabu, pairList);
@@ -156,8 +157,10 @@ int main()
     auto ticks5 = chrono::duration_cast<chrono::microseconds>(finish5 - start5);
     double result5 = ticks5.count() / 1000000.0;
     cout << endl << "1 explore space: time in seconds: " << result5 << endl;
+    
 
-    cout << endl << "RHS rows: " << Bk1.size() << endl;
+    cout << endl << "RHS knapsack rows: " << Bk1.size() << endl;
+    cout << endl << "RHS demand rows: " << Bd1.size() << endl;
     cout << endl << "LHS cols: " << Ak1[0].size() << endl;
     cout << endl;
 
@@ -246,7 +249,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
         }
         Sol.flipBit(i);
     }
-    for (int i = 0; i < pairs.size(); i++) {
+    for (int i = 0; i < 100; i++) {
         Sol.swapBit(pairs[i]);
         if (!tList.checkTabu(Sol)) {
             Sol.violAmounts(coeffs);
@@ -256,6 +259,42 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
         }
         Sol.swapBit(pairs[i]);
     }
+    
+    auto start = chrono::high_resolution_clock::now();
+
+    Sol.swapBit(pairs[5]);
+    if (!tList.checkTabu(Sol)) {
+        Sol.violAmounts(coeffs);
+        Best.violAmounts(coeffs);
+        if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
+            Best = Sol;
+    }
+    Sol.swapBit(pairs[5]);
+
+    auto finish = chrono::high_resolution_clock::now();
+    auto ticks = chrono::duration_cast<chrono::microseconds>(finish - start);
+    double result = ticks.count() / 1000000.0;
+    cout << endl << "swap and checks: time in seconds: " << result << endl;
+    
+
+    auto start2 = chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < 100; i++) {
+        Sol.swapBit(pairs[i]);
+        if (!tList.checkTabu(Sol)) {
+            Sol.violAmounts(coeffs);
+            Best.violAmounts(coeffs);
+            if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
+                Best = Sol;
+        }
+        Sol.swapBit(pairs[i]);
+    }
+
+    auto finish2 = chrono::high_resolution_clock::now();
+    auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
+    double result2 = ticks2.count() / 1000000.0;
+    cout << endl << "100 swaps and checks: time in seconds: " << result2 << endl;
+
     return Best;
 }
 

@@ -179,21 +179,26 @@ void Solution::swapBit(vector<int>& pair) {
 void Solution::violAmounts(ProblemCoefficients& coeff) {
 	int kRows = coeff.getBk().size();
 	int dRows = coeff.getBd().size();
-	valarray<int> violArray(0, (kRows + dRows));
+	penalty = 0;
+	//vector<int> violArray((kRows + dRows), 0);
 
 	for (int i = 0; i < kRows; i++) {
 		if (inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) < coeff.getBk()[i])
-			violArray[i] = 0;
+			//	violArray[i] = 0;
+			penalty += 0;
 		else
-			violArray[i] = inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
+			//	violArray[i] = inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
+			penalty += inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
 	}
 	for (int j = 0; j < dRows; j++) {
 		if (inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0) > coeff.getBd()[j])
-			violArray[kRows + j] = 0;
+			//violArray[kRows + j] = 0;
+			penalty += 0;
 		else
-			violArray[kRows + j] = coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
+			//violArray[kRows + j] = coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
+			penalty += coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
 	}
-	penalty = violArray.sum();
+	//penalty = accumulate(violArray.begin(), violArray.end(), 0);
 	if (penalty == 0)
 		feasible = true;
 	else
