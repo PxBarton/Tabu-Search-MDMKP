@@ -20,7 +20,7 @@ public:
 	/**
 	 * assigns problem coefficients from vectors 
 	 */
-	void loadCoeffs(vector<vector<int>> Ak, vector<vector<int>> Ad, vector<int> Bk, vector<int> Bd, vector<int> C);
+	void loadCoeffs(vector<vector<int>> Ak, vector<vector<int>> Ad, vector<int> Bk, vector<int> Bd, vector<int> C, int kRows, int dRows);
 
 	//void loadMKP(vector<int> A, vector<int> B, vector<int> C);
 
@@ -83,11 +83,15 @@ ProblemCoefficients::ProblemCoefficients() {
 
 }
 
-void ProblemCoefficients::loadCoeffs(vector<vector<int>> Ak, vector<vector<int>> Ad, vector<int> Bk, vector<int> Bd, vector<int> C) {
-	LHS_knapsack = Ak;
-	LHS_demand = Ad;
-	RHS_knapsack = Bk;
-	RHS_demand = Bd;
+void ProblemCoefficients::loadCoeffs(vector<vector<int>> Ak, vector<vector<int>> Ad, vector<int> Bk, vector<int> Bd, vector<int> C, int kRows, int dRows) {
+	for (int i = 0; i < kRows; i++)
+		LHS_knapsack.push_back(Ak[i]);
+	for (int i = 0; i < dRows; i++)
+		LHS_demand.push_back(Ad[i]);
+	for (int i = 0; i < kRows; i++)
+		RHS_knapsack.push_back(Bk[i]);
+	for (int i = 0; i < dRows; i++)
+		RHS_demand.push_back(Bd[i]);
 	objCoeffs = C;
 	cLen = C.size();
 	

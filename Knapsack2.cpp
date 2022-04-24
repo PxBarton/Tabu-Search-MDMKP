@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK;
+    int numRowsK = 15;
 
-    int numRowsD;
+    int numRowsD = 0;
 
     ifstream inf;
 
@@ -80,7 +80,7 @@ int main()
     //eng.reset();
 
     ProblemCoefficients Prob;
-    Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C);
+    Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C, numRowsK, numRowsD);
 
     Solution Sol(numVars);
     vector<vector<int>> pairList = Sol.createPairList();
@@ -159,8 +159,8 @@ int main()
     cout << endl << "1 explore space: time in seconds: " << result5 << endl;
     
 
-    cout << endl << "RHS knapsack rows: " << Bk1.size() << endl;
-    cout << endl << "RHS demand rows: " << Bd1.size() << endl;
+    cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
+    cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
     cout << endl << "LHS cols: " << Ak1[0].size() << endl;
     cout << endl;
 
@@ -249,7 +249,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
         }
         Sol.flipBit(i);
     }
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < pairs.size(); i++) {
         Sol.swapBit(pairs[i]);
         if (!tList.checkTabu(Sol)) {
             Sol.violAmounts(coeffs);
@@ -279,7 +279,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
 
     auto start2 = chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < pairs.size(); i++) {
         Sol.swapBit(pairs[i]);
         if (!tList.checkTabu(Sol)) {
             Sol.violAmounts(coeffs);
@@ -293,7 +293,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     auto finish2 = chrono::high_resolution_clock::now();
     auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
     double result2 = ticks2.count() / 1000000.0;
-    cout << endl << "100 swaps and checks: time in seconds: " << result2 << endl;
+    cout << endl << "all swaps and checks: time in seconds: " << result2 << endl;
 
     return Best;
 }
