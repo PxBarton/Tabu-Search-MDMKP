@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 10;
+    int numRowsK = 30;
 
-    int numRowsD = 10;
+    int numRowsD = 30;
 
     ifstream inf;
 
@@ -91,8 +91,10 @@ int main()
     //cout << endl;
 
     Sol.generate();
-    //Sol.printSolution();
-
+    Sol.printSolution();
+    cout << endl << Sol.getZ() << "  " << Sol.calcZ(Prob) << "  " << Sol.getZ() << endl;
+    Solution solCopy = Sol; 
+    cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
     cout << Sol.calcZ(Prob);
 
@@ -186,17 +188,20 @@ int main()
     /////////////////////////////////////////////////
     // Tabu search Algorithm 
 
+    auto start6 = chrono::high_resolution_clock::now();
+
     Solution Init(numVars);
     Init.generate();
 
     Solution bestSol = Init;
     Solution nextSol = Init;
     Solution bestFeas = Init;
+    bestFeas.violAmounts(Prob);
     Tabu.insertTabu(bestSol);
     Tabu.insertTabu(nextSol);
     int count = 0;
 
-    while (count < 100) {
+    while (count < 50) {
         Solution newSol = exploreSpaces(nextSol, Prob, Tabu, pairList);
         newSol.violAmounts(Prob);
         bestSol.violAmounts(Prob);
@@ -215,10 +220,7 @@ int main()
         else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
             if (!Tabu.checkTabu(newSol)) {
                 nextSol = newSol;
-                if (newSol.isFeasible()) {
-                    bestFeas = newSol;
-                    cout << "feasible" << endl;
-                }
+                
                 Tabu.insertTabu(newSol);
             }
             else
@@ -231,12 +233,16 @@ int main()
     }
     cout << "best Z: " << bestSol.getZ() << endl;
     if (bestFeas.isFeasible()) {
-        cout << "best feasible Z: " << bestFeas.getZ() << endl;
+        cout << "best feasible Z: " << bestFeas.calcZ(Prob) << endl;
         bestFeas.printSolution();
     }
     else
         cout << "no feasible solution found" << endl;
 
+    auto finish6 = chrono::high_resolution_clock::now();
+    auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
+    double result6 = ticks6.count() / 1000000.0;
+    cout << endl << "Tabu Search, 15 and 15: time in seconds: " << result6 << endl;
 }
 
 //------------------------------------------------------------------------------
