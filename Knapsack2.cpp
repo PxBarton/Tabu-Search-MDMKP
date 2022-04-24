@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 30;
+    int numRowsK = 10;
 
-    int numRowsD = 30;
+    int numRowsD = 10;
 
     ifstream inf;
 
@@ -204,28 +204,36 @@ int main()
             if (!Tabu.checkTabu(newSol)) {
                 bestSol = newSol;
                 nextSol = newSol;
-                if (newSol.isFeasible())
+                if (newSol.isFeasible()) {
                     bestFeas = newSol;
+                    cout << "feasible" << endl;
+                }
                 Tabu.insertTabu(newSol);
-                cout << "improve  " << newSol.getZ() << "  " << newSol.evalFit(Prob);
+                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
             }
         }
         else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
             if (!Tabu.checkTabu(newSol)) {
                 nextSol = newSol;
+                if (newSol.isFeasible()) {
+                    bestFeas = newSol;
+                    cout << "feasible" << endl;
+                }
                 Tabu.insertTabu(newSol);
             }
             else
                 break;
-            cout << "no improve" << newSol.getZ() << "  " << newSol.evalFit(Prob);
+            cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
         }
         cout << count << endl;
         count++;
 
     }
     cout << "best Z: " << bestSol.getZ() << endl;
-    if (!bestFeas.isFeasible())
+    if (bestFeas.isFeasible()) {
         cout << "best feasible Z: " << bestFeas.getZ() << endl;
+        bestFeas.printSolution();
+    }
     else
         cout << "no feasible solution found" << endl;
 

@@ -69,6 +69,8 @@ public:
 
 	int getZ();
 
+	int getP();
+
 	/**
 	 * returns the value (0 or 1) of the solution 
 	 * at a particular index
@@ -223,7 +225,10 @@ int Solution::evalFit(ProblemCoefficients& coeff) {
 }
 
 bool Solution::isFeasible() {
-	return feasible;
+	if (penalty == 0)
+		return true;
+	else
+		return false;
 }
 
 int Solution::getLength() {
@@ -242,6 +247,10 @@ void Solution::printSolution() {
 
 int Solution::getZ() {
 	return zScore;
+}
+
+int Solution::getP() {
+	return penalty;
 }
 
 Solution& Solution::operator=(Solution& right) {
