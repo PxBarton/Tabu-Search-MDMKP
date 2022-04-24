@@ -177,12 +177,12 @@ void Solution::swapBit(vector<int>& pair) {
 }
 
 void Solution::violAmounts(ProblemCoefficients& coeff) {
-	int kRows = coeff.getBk().size();
-	int dRows = coeff.getBd().size();
+	//int kRows = coeff.getBk().size();
+	//int dRows = coeff.getBd().size();
 	penalty = 0;
 	//vector<int> violArray((kRows + dRows), 0);
 
-	for (int i = 0; i < kRows; i++) {
+	for (int i = 0; i < coeff.getBk().size(); i++) {
 		if (inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) < coeff.getBk()[i])
 			//	violArray[i] = 0;
 			penalty += 0;
@@ -190,7 +190,7 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 			//	violArray[i] = inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
 			penalty += inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
 	}
-	for (int j = 0; j < dRows; j++) {
+	for (int j = 0; j < coeff.getBd().size(); j++) {
 		if (inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0) > coeff.getBd()[j])
 			//violArray[kRows + j] = 0;
 			penalty += 0;
@@ -206,14 +206,11 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 }
 
 int Solution::calcZ(ProblemCoefficients& coeff) {
-	if (xLen == coeff.getLen()) {
-		int z;
-		z = inner_product(begin(xItems), end(xItems), coeff.getC().begin(), 0);
-		zScore = z;
-		return z;
-	}
-	else
-		cout << "Incompatible sizes" << endl;
+	int z;
+	z = inner_product(begin(xItems), end(xItems), coeff.getC().begin(), 0);
+	zScore = z;
+	return z;
+	
 	
 }
 

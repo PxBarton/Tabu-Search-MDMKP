@@ -25,7 +25,7 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length);
 vector<int> readCoeffs(ifstream &file, string fileName);
 
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, 
-    TabuList& tabuList, vector<vector<int>> pairs);
+    TabuList& tabuList, vector<vector<int>>& pairs);
 
 
 
@@ -232,7 +232,7 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
     return temp;
 }
 
-Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> pairs) {
+Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> &pairs) {
     // Solution Init(solutionSize);
     // Init = Sol;
     int size = Sol.getLength();
