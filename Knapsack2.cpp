@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 30;
+    int numRowsK = 20;
 
-    int numRowsD = 30;
+    int numRowsD = 10;
 
     ifstream inf;
 
@@ -86,7 +86,8 @@ int main()
     vector<vector<int>> pairList = Sol.createPairList();
     cout << "no. pairs: " << pairList.size() << endl;
    
-    //Prob.printAk();
+    Prob.printAk();
+    Prob.printAd();
     //Prob.printC();
     //cout << endl;
 
@@ -201,10 +202,11 @@ int main()
     Tabu.insertTabu(nextSol);
     int count = 0;
 
-    while (count < 50) {
+    while (count < 1) {
         Solution newSol = exploreSpaces(nextSol, Prob, Tabu, pairList);
         newSol.violAmounts(Prob);
         bestSol.violAmounts(Prob);
+        bestFeas.violAmounts(Prob);
         if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
             if (!Tabu.checkTabu(newSol)) {
                 bestSol = newSol;
@@ -220,18 +222,24 @@ int main()
         else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
             if (!Tabu.checkTabu(newSol)) {
                 nextSol = newSol;
-                
                 Tabu.insertTabu(newSol);
+                if (newSol.isFeasible()) {
+                    if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
+                        bestFeas = newSol;
+                    cout << "feasible" << endl;
+                }
+                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
             }
-            else
-                break;
-            cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
         }
+        //else
+            //break;
+            //cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
         cout << count << endl;
         count++;
 
     }
     cout << "best Z: " << bestSol.getZ() << endl;
+    bestFeas.violAmounts(Prob);
     if (bestFeas.isFeasible()) {
         cout << "best feasible Z: " << bestFeas.calcZ(Prob) << endl;
         bestFeas.printSolution();
@@ -242,7 +250,7 @@ int main()
     auto finish6 = chrono::high_resolution_clock::now();
     auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
     double result6 = ticks6.count() / 1000000.0;
-    cout << endl << "Tabu Search, 15 and 15: time in seconds: " << result6 << endl;
+    cout << endl << "Tabu Search, 20 and 10: time in seconds: " << result6 << endl;
 }
 
 //------------------------------------------------------------------------------

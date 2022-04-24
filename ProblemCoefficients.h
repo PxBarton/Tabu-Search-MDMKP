@@ -136,3 +136,11 @@ void ProblemCoefficients::printAk() {
 
 		
 }
+
+void ProblemCoefficients::printAd() {
+	for (int i = 0; i < LHS_demand.size(); i++) {
+		for (int j = 0; j < LHS_demand[i].size(); j++)
+			cout << LHS_demand[i][j] << ' ';
+		cout << endl;
+		cout << endl;
+	}
