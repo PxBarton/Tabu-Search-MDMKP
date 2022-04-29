@@ -1,8 +1,6 @@
 // Knapsack2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-// Knapsack.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include <iostream>
 #include <fstream>
@@ -36,9 +34,9 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 20;
+    int numRowsK = 5;
 
-    int numRowsD = 10;
+    int numRowsD = 5;
 
     ifstream inf;
 
@@ -223,6 +221,9 @@ int main()
     Tabu.insertTabu(bestSol);
     Tabu.insertTabu(nextSol);
     int count = 0;
+
+    // set 'true' for Tabu search using Tabu list of hash vectors
+    // set 'false' for local search without Tabu list
     bool useTabuList = false;
 
     while (count < 100) {
@@ -258,7 +259,6 @@ int main()
                     bestFeas = newSol;
                     cout << "feasible" << endl;
                 }
-                Tabu.insertTabu(newSol);
                 cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
             }
 
@@ -278,7 +278,6 @@ int main()
             }
             else {
                 nextSol = newSol;
-                Tabu.insertTabu(newSol);
                 if (newSol.isFeasible()) {
                     if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
                         bestFeas = newSol;
@@ -306,11 +305,14 @@ int main()
     auto finish6 = chrono::high_resolution_clock::now();
     auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
     double result6 = ticks6.count() / 1000000.0;
-    cout << endl << "Tabu Search, 20 and 10: time in seconds: " << result6 << endl;
+    cout << endl << "Tabu Search, " << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
 }
 
 //------------------------------------------------------------------------------
+// end Main
 
+
+// opens a file of coefficients
 bool openFile(ifstream& file, string fileName) {
     file.open(fileName.c_str());
     if (file.fail())
@@ -318,6 +320,7 @@ bool openFile(ifstream& file, string fileName) {
     return(true);
 }
 
+// extracts zero or more rows of LHS coefficients
 vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length) {
     vector<vector<int>> tempMatrix;
     vector<int> rowVector;
@@ -346,7 +349,7 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length) {
     return tempMatrix;
 }
 
-
+// extracts RHS and objective function coefficients
 vector<int> readCoeffs(ifstream &file, string fileName) {
     vector<int> temp;
     openFile(file, fileName);
@@ -358,6 +361,10 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
     return temp;
 }
 
+
+// performs the search of the flip space and swap space for a given solution
+// returning the best solution
+// Tabu list enabled
 Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> &pairs) {
     
     int size = Sol.getLength();
@@ -387,6 +394,9 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     return Best;
 }
 
+// performs the search of the flip space and swap space for a given solution
+// returning the best solution
+// Tabu list disabled
 Solution exploreSpacesNoTabu(Solution& Sol, ProblemCoefficients& coeffs, vector<vector<int>>& pairs) {
 
     int size = Sol.getLength();
@@ -414,7 +424,34 @@ Solution exploreSpacesNoTabu(Solution& Sol, ProblemCoefficients& coeffs, vector<
     return Best;
 }
 
+// alternate version for extracting LHS coefficients from csv files
+// different signature and needs testing with txt files
+/*
+vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int numRows) {
+    vector<vector<int>> tempMatrix;
+    vector<int> rowVector;
+    string tempRow;
+    string line;
+    int rowCount = 0;
 
+    openFile(LHSfile, fileName);
+
+    while (getline(LHSfile, line, '\r') && rowCount < numRows) {
+        string token;
+        stringstream sin(line);
+        rowVector.clear();
+        while (sin >> token) {
+            if (rowVector.size() < length)
+                rowVector.push_back(stoi(token));
+        }
+        tempMatrix.push_back(rowVector);
+        rowCount++;
+
+    }
+
+    LHSfile.close();
+    return tempMatrix;
+*/
 
 //--------------------------------------------------------------------------
 

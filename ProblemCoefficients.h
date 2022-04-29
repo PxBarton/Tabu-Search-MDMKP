@@ -74,8 +74,6 @@ private:
 	vector<int> objCoeffs; 
 
 	int cLen = 0;
-
-
 	
 };
 
@@ -132,9 +130,7 @@ void ProblemCoefficients::printAk() {
 			cout << LHS_knapsack[i][j] << ' ';
 		cout << endl;
 	cout << endl;
-	}
-
-		
+	}	
 }
 
 void ProblemCoefficients::printAd() {
@@ -144,4 +140,18 @@ void ProblemCoefficients::printAd() {
 		cout << endl;
 		cout << endl;
 	}
+}
+
+void ProblemCoefficients::printBk() {
+	for (int i = 0; i < cLen; i++) {
+		cout << RHS_knapsack[i] << ' ';
+	}
+	cout << endl << endl;
+}
+
+void ProblemCoefficients::printBd() {
+	for (int i = 0; i < cLen; i++) {
+		cout << RHS_demand[i] << ' ';
+	}
+	cout << endl << endl;
 }
