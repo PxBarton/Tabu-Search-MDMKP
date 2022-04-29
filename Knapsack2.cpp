@@ -35,9 +35,9 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 30;
+    int numRowsK = 5;
 
-    int numRowsD = 30;
+    int numRowsD = 5;
 
     ifstream inf;
 
@@ -65,7 +65,7 @@ int main()
     vector<int> C_obj = { 11, 22, 33, 44, 55, 66, 77, 88};
     vector<int> testSol;
 
-    // set up random number generator for test 
+    // set up random number generator for testing a small instance
     double seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine eng(seed);
     uniform_int_distribution<int> dis(0, 500);
@@ -74,7 +74,7 @@ int main()
         int entry = dis(eng);
         testSol.push_back(entry);
     }
-
+    
     // vectors to hold coefficients extracted from files
     vector<vector<int>> Ak1 = readLHS(inf, file1, numVars);
     vector<vector<int>> Ad1 = readLHS(inf, file2, numVars);
@@ -97,8 +97,14 @@ int main()
     cout << "no. pairs: " << pairList.size() << endl << endl;
 
     // create the empty Tabu list using three hash vectors of length l
+    // multipliers y1, y2, and y3 to prevent collisions
+    double y1 = 1.5;
+    double y2 = 1.8;
+    double y3 = 2.2;
     int l = 100000000;
-    TabuList Tabu(l, 1.5, 1.8, 2.2);
+
+    TabuList Tabu(l, y1, y2, y3);
+    cout << endl << "solution tabu? " << Tabu.checkTabu(Sol) << endl;
 
     cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
     cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
@@ -123,90 +129,7 @@ int main()
 
     cout << Sol.calcZ(Prob);
 
-    ////////////////////////////////////////
-    // timing tests of various processes
-
-    /*
-    auto start = chrono::high_resolution_clock::now();
-
-    int i = 0;
-    while (i < 1000000) {
-        Sol.calcZ(Prob);
-        i++;
-    }
-
-    auto finish = chrono::high_resolution_clock::now();
-    auto ticks = chrono::duration_cast<chrono::microseconds>(finish - start);
-    double result = ticks.count() / 1000000.0;
-    cout << endl <<  "compute z, 100000 times: time in seconds: " << result  << endl;
-
-    vector<vector<int>> allPairs = Sol.createPairList();
-
-    auto start3 = chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < allPairs.size(); i++)
-        Sol.swapBit(allPairs[i]);
-
-    auto finish3 = chrono::high_resolution_clock::now();
-    auto ticks3 = chrono::duration_cast<chrono::microseconds>(finish3 - start3);
-    double result3 = ticks3.count() / 1000000.0;
-    cout << endl << "swapping elements: time in seconds: " << result3 << endl;
-
-    Sol.violAmounts(Prob);
-    cout << Sol.evalFit(Prob) << endl;
-    cout << "Z: " << Sol.getZ() << endl;
-    cout << Sol.isFeasible() << endl;
-
-    auto start2 = chrono::high_resolution_clock::now();
-
-    int l = 100000000;
-    TabuList Tabu(l);
-
-    auto finish2 = chrono::high_resolution_clock::now();
-    auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
-    double result2 = ticks2.count() / 1000000.0;
-    cout << endl << "generating hash vectors: time in seconds: " << result2 << endl;
-
-    Tabu.insertTabu(Sol);
-    cout << Tabu.checkTabu(Sol) << endl;
-
-    auto start4 = chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < 10000; i++)
-        Tabu.checkTabu(Sol);
-
-    auto finish4 = chrono::high_resolution_clock::now();
-    auto ticks4 = chrono::duration_cast<chrono::microseconds>(finish4 - start4);
-    double result4 = ticks4.count() / 1000000.0;
-    cout << endl << "checking Tabu List: time in seconds: " << result4 << endl;
     
-    auto start5 = chrono::high_resolution_clock::now();
-
-    exploreSpaces(Sol, Prob, Tabu, pairList);
-
-    auto finish5 = chrono::high_resolution_clock::now();
-    auto ticks5 = chrono::duration_cast<chrono::microseconds>(finish5 - start5);
-    double result5 = ticks5.count() / 1000000.0;
-    cout << endl << "1 explore space: time in seconds: " << result5 << endl;
-    
-
-    for (int i = 0; i < Ak1.size(); i++) {
-        for (int j = 0; j < Ak1[i].size(); j++)
-            cout << Ak1[i][j] << ' ';
-        cout << endl;
-    }
-    
-
-    for (int i = 0; i < Bk1.size(); i++)
-        cout << Bk1[i] << ' ';
-
-    cout << endl;
-    Solution Sol2(numVars);
-    Sol2.printSolution();
-    Sol.printSolution();
-    Sol2 = Sol;
-    Sol2.printSolution();
-    */
 
     /////////////////////////////////////////////////
     // Tabu search algorithm 
@@ -229,7 +152,7 @@ int main()
     // set 'false' for local search without Tabu list
     bool useTabuList = true;
 
-    while (count < 500) {
+    while (count < 100) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
@@ -254,6 +177,8 @@ int main()
                     Tabu.insertTabu(newSol);
                     cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
                 }
+                else
+                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
             }
             else {
                 bestSol = newSol;
@@ -278,6 +203,8 @@ int main()
                     }
                     cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
                 }
+                else 
+                    cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
             }
             else {
                 nextSol = newSol;
@@ -308,7 +235,11 @@ int main()
     auto finish6 = chrono::high_resolution_clock::now();
     auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
     double result6 = ticks6.count() / 1000000.0;
-    cout << endl << "Tabu Search, " << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
+    if (useTabuList == true)
+        cout << endl << "Using Tabu List" << endl;
+    else
+        cout << endl << "Not using Tabu List" << endl;
+    cout << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -382,6 +313,8 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
             if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
                 Best = Sol;
         }
+        else
+            cout << "Tabu solution found" << endl;
         Sol.flipBit(i);
     }
     for (int i = 0; i < pairs.size(); i++) {
@@ -392,6 +325,8 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
             if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
                 Best = Sol;
         }
+        else 
+            cout << "Tabu solution found" << endl;
         Sol.swapBit(pairs[i]);
     }
     return Best;
@@ -462,7 +397,90 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int 
 // using vectors and vector<bool> for solution
 // 2 seconds for 1,000,000 dots with vector<int> solution
 
+////////////////////////////////////////
+    // timing tests of various processes
 
+    /*
+    auto start = chrono::high_resolution_clock::now();
+
+    int i = 0;
+    while (i < 1000000) {
+        Sol.calcZ(Prob);
+        i++;
+    }
+
+    auto finish = chrono::high_resolution_clock::now();
+    auto ticks = chrono::duration_cast<chrono::microseconds>(finish - start);
+    double result = ticks.count() / 1000000.0;
+    cout << endl <<  "compute z, 100000 times: time in seconds: " << result  << endl;
+
+    vector<vector<int>> allPairs = Sol.createPairList();
+
+    auto start3 = chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < allPairs.size(); i++)
+        Sol.swapBit(allPairs[i]);
+
+    auto finish3 = chrono::high_resolution_clock::now();
+    auto ticks3 = chrono::duration_cast<chrono::microseconds>(finish3 - start3);
+    double result3 = ticks3.count() / 1000000.0;
+    cout << endl << "swapping elements: time in seconds: " << result3 << endl;
+
+    Sol.violAmounts(Prob);
+    cout << Sol.evalFit(Prob) << endl;
+    cout << "Z: " << Sol.getZ() << endl;
+    cout << Sol.isFeasible() << endl;
+
+    auto start2 = chrono::high_resolution_clock::now();
+
+    int l = 100000000;
+    TabuList Tabu(l);
+
+    auto finish2 = chrono::high_resolution_clock::now();
+    auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
+    double result2 = ticks2.count() / 1000000.0;
+    cout << endl << "generating hash vectors: time in seconds: " << result2 << endl;
+
+    Tabu.insertTabu(Sol);
+    cout << Tabu.checkTabu(Sol) << endl;
+
+    auto start4 = chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < 10000; i++)
+        Tabu.checkTabu(Sol);
+
+    auto finish4 = chrono::high_resolution_clock::now();
+    auto ticks4 = chrono::duration_cast<chrono::microseconds>(finish4 - start4);
+    double result4 = ticks4.count() / 1000000.0;
+    cout << endl << "checking Tabu List: time in seconds: " << result4 << endl;
+
+    auto start5 = chrono::high_resolution_clock::now();
+
+    exploreSpaces(Sol, Prob, Tabu, pairList);
+
+    auto finish5 = chrono::high_resolution_clock::now();
+    auto ticks5 = chrono::duration_cast<chrono::microseconds>(finish5 - start5);
+    double result5 = ticks5.count() / 1000000.0;
+    cout << endl << "1 explore space: time in seconds: " << result5 << endl;
+
+
+    for (int i = 0; i < Ak1.size(); i++) {
+        for (int j = 0; j < Ak1[i].size(); j++)
+            cout << Ak1[i][j] << ' ';
+        cout << endl;
+    }
+
+
+    for (int i = 0; i < Bk1.size(); i++)
+        cout << Bk1[i] << ' ';
+
+    cout << endl;
+    Solution Sol2(numVars);
+    Sol2.printSolution();
+    Sol.printSolution();
+    Sol2 = Sol;
+    Sol2.printSolution();
+    */
 
 //--------------------------------------------------------------------------
 
