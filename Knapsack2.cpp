@@ -34,9 +34,9 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 5;
+    int numRowsK = 30;
 
-    int numRowsD = 5;
+    int numRowsD = 30;
 
     ifstream inf;
 
@@ -96,7 +96,7 @@ int main()
 
     // create the empty Tabu list using three hash vectors of length l
     int l = 100000000;
-    TabuList Tabu(l);
+    TabuList Tabu(l, 1.5, 1.8, 2.2);
 
     cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
     cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
@@ -224,9 +224,9 @@ int main()
 
     // set 'true' for Tabu search using Tabu list of hash vectors
     // set 'false' for local search without Tabu list
-    bool useTabuList = false;
+    bool useTabuList = true;
 
-    while (count < 100) {
+    while (count < 200) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
