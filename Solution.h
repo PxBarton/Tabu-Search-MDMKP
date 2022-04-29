@@ -24,6 +24,14 @@ public:
 	 */
 	void generate();
 
+	/**
+	 * generates a random solution using default_random_engine
+	 * where K is the number of 1's in the solution
+	 * 'K items in the knapsack'
+	 * K estimated through external means, such as Excel LP relaxation, etc
+	 */
+	void K_Solution_Gen(int K);
+
 	void clearSolution();
 
 	/**
@@ -123,6 +131,25 @@ void Solution::generate() {
 		else
 			xItems[i] = 0;
 	dist.reset();
+}
+
+void Solution::K_Solution_Gen(int K) {
+	int index;
+	bool filled = false;
+	default_random_engine gen;
+	gen.seed(chrono::system_clock::now().time_since_epoch().count());
+	uniform_int_distribution<int> dis(0, 100);
+	for (int i = 0; i < K; i++) {
+		index = dis(gen);
+		if (xItems[index] == 0)
+			xItems[index] = 1;
+		else {
+			while (xItems[index] == 1) {
+				index = dis(gen);
+			}
+			xItems[index] = 1;
+		}
+	}
 }
 
 void Solution::clearSolution() {

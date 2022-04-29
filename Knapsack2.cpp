@@ -28,6 +28,7 @@ Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
 Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
 
 
+//Solution K_Solution_Gen(int K);
 
 int main()
 {
@@ -88,6 +89,7 @@ int main()
 
     // create a Solution object 
     Solution Sol(numVars);
+    
 
     // generate a list of all the pairs of indices of a solution 
     // to explore the swap space (pairList size is 'n choose 2')
@@ -112,7 +114,8 @@ int main()
     cout << endl;
 
     // generate a random solution, vector of 0's and 1's, length = numVars 
-    Sol.generate();
+    //Sol.generate();
+    Sol.K_Solution_Gen(5);
     Sol.printSolution();
     cout << endl << Sol.getZ() << "  " << Sol.calcZ(Prob) << "  " << Sol.getZ() << endl;
     Solution solCopy = Sol; 
@@ -212,7 +215,7 @@ int main()
     auto start6 = chrono::high_resolution_clock::now();
 
     Solution Init(numVars);
-    Init.generate();
+    Init.K_Solution_Gen(26);
 
     Solution bestSol = Init;
     Solution nextSol = Init;
@@ -226,7 +229,7 @@ int main()
     // set 'false' for local search without Tabu list
     bool useTabuList = true;
 
-    while (count < 200) {
+    while (count < 500) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
