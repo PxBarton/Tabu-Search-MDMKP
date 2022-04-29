@@ -27,25 +27,23 @@ vector<int> readCoeffs(ifstream &file, string fileName);
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, 
     TabuList& tabuList, vector<vector<int>>& pairs);
 
+Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
+
 
 
 int main()
 {
-    double seed = chrono::system_clock::now().time_since_epoch().count();
-    //random_device rd;
-    //mt19937 eng(rd());
-    default_random_engine eng(seed);
-    uniform_int_distribution<int> dis(0, 500);
-
+    
     int numVars = 100;
 
-    int numRowsK = 10;
+    int numRowsK = 20;
 
     int numRowsD = 10;
 
     ifstream inf;
 
-    
+    // a set of five files for an MDMKP problem
+    // two files for the LHS, two for the RHS, one for the objective function coeff's
     string file1 = "coeffs2/LHSknapsack2.txt";
     string file2 = "coeffs2/LHSdemand2.txt";
     string file3 = "coeffs2/RHSknapsack2.csv";
@@ -60,31 +58,52 @@ int main()
     string file5 = "MDMKP/objFuncC.txt";
     */
 
+    // a small sample set of MDMKP coeff's
     vector<vector<int>> A_k = { {1, 2, 3, 4, 5, 6, 7, 8}, {5, 6, 7, 8, 9, 10, 11, 12} };
     vector<vector<int>> A_d = { {2, 4, 6, 8, 10, 12, 14, 16}, {10, 12, 14, 16, 18, 20, 22, 24} };
     vector<int> B_k = { 50, 30 };
     vector<int> B_d = { 80, 20 };
     vector<int> C_obj = { 11, 22, 33, 44, 55, 66, 77, 88};
-    vector<int> fake;
+    vector<int> testSol;
 
+    // set up random number generator for test 
+    double seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine eng(seed);
+    uniform_int_distribution<int> dis(0, 500);
+
+    for (int k = 0; k < numVars; k++) {
+        int entry = dis(eng);
+        testSol.push_back(entry);
+    }
+
+    // vectors to hold coefficients extracted from files
     vector<vector<int>> Ak1 = readLHS(inf, file1, numVars);
     vector<vector<int>> Ad1 = readLHS(inf, file2, numVars);
     vector<int> Bk1 = readCoeffs(inf, file3);
     vector<int> Bd1 = readCoeffs(inf, file4);
     vector<int> C = readCoeffs(inf, file5);
 
-    for (int k = 0; k < numVars; k++) {
-        int entry = dis(eng);
-        fake.push_back(entry);
-    }
-    //eng.reset();
-
+    // create a ProblemCoefficients object to store the MDMKP coeff's
+    // populate with the coefficients extracted from files
     ProblemCoefficients Prob;
     Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C, numRowsK, numRowsD);
 
+    // create a Solution object 
     Solution Sol(numVars);
+
+    // generate a list of all the pairs of indices of a solution 
+    // to explore the swap space (pairList size is 'n choose 2')
     vector<vector<int>> pairList = Sol.createPairList();
     cout << "no. pairs: " << pairList.size() << endl << endl;
+
+    // create the empty Tabu list using three hash vectors of length l
+    int l = 100000000;
+    TabuList Tabu(l);
+
+    cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
+    cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
+    cout << endl << "LHS cols: " << Ak1[0].size() << endl;
+    cout << endl;
     
     cout << "Knapsack LHS --------------------------------" << endl << endl;
     Prob.printAk();
@@ -94,6 +113,7 @@ int main()
     Prob.printC();
     cout << endl;
 
+    // generate a random solution, vector of 0's and 1's, length = numVars 
     Sol.generate();
     Sol.printSolution();
     cout << endl << Sol.getZ() << "  " << Sol.calcZ(Prob) << "  " << Sol.getZ() << endl;
@@ -102,10 +122,14 @@ int main()
 
     cout << Sol.calcZ(Prob);
 
+    ////////////////////////////////////////
+    // timing tests of various processes
+
+    /*
     auto start = chrono::high_resolution_clock::now();
 
     int i = 0;
-    while (i < 200) {
+    while (i < 1000000) {
         Sol.calcZ(Prob);
         i++;
     }
@@ -165,12 +189,6 @@ int main()
     cout << endl << "1 explore space: time in seconds: " << result5 << endl;
     
 
-    cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
-    cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
-    cout << endl << "LHS cols: " << Ak1[0].size() << endl;
-    cout << endl;
-
-    /*
     for (int i = 0; i < Ak1.size(); i++) {
         for (int j = 0; j < Ak1[i].size(); j++)
             cout << Ak1[i][j] << ' ';
@@ -190,7 +208,8 @@ int main()
     */
 
     /////////////////////////////////////////////////
-    // Tabu search Algorithm 
+    // Tabu search algorithm 
+    // based on algorithm from Lai et al, 2019
 
     auto start6 = chrono::high_resolution_clock::now();
 
@@ -204,14 +223,35 @@ int main()
     Tabu.insertTabu(bestSol);
     Tabu.insertTabu(nextSol);
     int count = 0;
+    bool useTabuList = false;
 
     while (count < 100) {
-        Solution newSol = exploreSpaces(nextSol, Prob, Tabu, pairList);
+        Solution newSol(numVars);
+        if (useTabuList == true) {
+            Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
+            newSol = Result;
+        }
+        else {
+            Solution Result = exploreSpacesNoTabu(nextSol, Prob, pairList);
+            newSol = Result;
+        }
         newSol.violAmounts(Prob);
         bestSol.violAmounts(Prob);
         bestFeas.violAmounts(Prob);
         if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
-            if (!Tabu.checkTabu(newSol)) {
+            if (useTabuList == true) {
+                if (!Tabu.checkTabu(newSol)) {
+                    bestSol = newSol;
+                    nextSol = newSol;
+                    if (newSol.isFeasible()) {
+                        bestFeas = newSol;
+                        cout << "feasible" << endl;
+                    }
+                    Tabu.insertTabu(newSol);
+                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
+                }
+            }
+            else {
                 bestSol = newSol;
                 nextSol = newSol;
                 if (newSol.isFeasible()) {
@@ -221,9 +261,22 @@ int main()
                 Tabu.insertTabu(newSol);
                 cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
             }
+
         }
         else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
-            if (!Tabu.checkTabu(newSol)) {
+            if (useTabuList == true) {
+                if (!Tabu.checkTabu(newSol)) {
+                    nextSol = newSol;
+                    Tabu.insertTabu(newSol);
+                    if (newSol.isFeasible()) {
+                        if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
+                            bestFeas = newSol;
+                        cout << "feasible" << endl;
+                    }
+                    cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
+                }
+            }
+            else {
                 nextSol = newSol;
                 Tabu.insertTabu(newSol);
                 if (newSol.isFeasible()) {
@@ -306,12 +359,11 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
 }
 
 Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> &pairs) {
-    // Solution Init(solutionSize);
-    // Init = Sol;
+    
     int size = Sol.getLength();
     Solution Best(size);
     Best.clearSolution();
-    // tList.insertTabu(Init);
+    
     for (int i = 0; i < size; i++) {
         Sol.flipBit(i);
         if (!tList.checkTabu(Sol)) {
@@ -332,46 +384,35 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
         }
         Sol.swapBit(pairs[i]);
     }
-    /*
-    auto start = chrono::high_resolution_clock::now();
+    return Best;
+}
 
-    Sol.swapBit(pairs[5]);
-    if (!tList.checkTabu(Sol)) {
+Solution exploreSpacesNoTabu(Solution& Sol, ProblemCoefficients& coeffs, vector<vector<int>>& pairs) {
+
+    int size = Sol.getLength();
+    Solution Best(size);
+    Best.clearSolution();
+
+    for (int i = 0; i < size; i++) {
+        Sol.flipBit(i);
         Sol.violAmounts(coeffs);
         Best.violAmounts(coeffs);
         if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
             Best = Sol;
+
+        Sol.flipBit(i);
     }
-    Sol.swapBit(pairs[5]);
-
-    auto finish = chrono::high_resolution_clock::now();
-    auto ticks = chrono::duration_cast<chrono::microseconds>(finish - start);
-    double result = ticks.count() / 1000000.0;
-    cout << endl << "swap and checks: time in seconds: " << result << endl;
-    
-
-    auto start2 = chrono::high_resolution_clock::now();
-
     for (int i = 0; i < pairs.size(); i++) {
         Sol.swapBit(pairs[i]);
-        if (!tList.checkTabu(Sol)) {
-            Sol.violAmounts(coeffs);
-            Best.violAmounts(coeffs);
-            if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
-                Best = Sol;
-        }
+        Sol.violAmounts(coeffs);
+        Best.violAmounts(coeffs);
+        if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
+            Best = Sol;
+
         Sol.swapBit(pairs[i]);
     }
-
-    auto finish2 = chrono::high_resolution_clock::now();
-    auto ticks2 = chrono::duration_cast<chrono::microseconds>(finish2 - start2);
-    double result2 = ticks2.count() / 1000000.0;
-    cout << endl << "all swaps and checks: time in seconds: " << result2 << endl;
-    */
     return Best;
 }
-
-
 
 
 
