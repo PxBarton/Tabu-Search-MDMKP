@@ -73,7 +73,7 @@ private:
 
 	vector<int> objCoeffs; 
 
-	int cLen;
+	int cLen = 0;
 
 
 	
