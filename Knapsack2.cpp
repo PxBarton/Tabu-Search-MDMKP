@@ -39,9 +39,9 @@ int main()
 
     int numVars = 100;
 
-    int numRowsK = 6;
+    int numRowsK = 10;
 
-    int numRowsD = 4;
+    int numRowsD = 10;
 
     ifstream inf;
 
@@ -205,7 +205,7 @@ int main()
     Tabu.insertTabu(nextSol);
     int count = 0;
 
-    while (count < 1) {
+    while (count < 100) {
         Solution newSol = exploreSpaces(nextSol, Prob, Tabu, pairList);
         newSol.violAmounts(Prob);
         bestSol.violAmounts(Prob);
