@@ -87,6 +87,8 @@ public:
 
 	int getLength();
 
+	int calcK();
+
 	void printSolution();
 
 	/**
@@ -278,6 +280,10 @@ int Solution::getZ() {
 
 int Solution::getP() {
 	return penalty;
+}
+
+int Solution::calcK() {
+	return xItems.sum();
 }
 
 Solution& Solution::operator=(Solution& right) {

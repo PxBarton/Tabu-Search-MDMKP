@@ -139,6 +139,7 @@ int main()
 
     Solution Init(numVars);
     Init.K_Solution_Gen(26);
+    //Init.generate();
 
     Solution bestSol = Init;
     Solution nextSol = Init;
@@ -226,7 +227,7 @@ int main()
     cout << "best Z: " << bestSol.getZ() << endl;
     bestFeas.violAmounts(Prob);
     if (bestFeas.isFeasible()) {
-        cout << "best feasible Z: " << bestFeas.calcZ(Prob) << endl;
+        cout << "best feasible Z: " << bestFeas.calcZ(Prob) << "      " << "k: " << bestFeas.calcK() << endl;
         bestFeas.printSolution();
     }
     else
@@ -313,8 +314,8 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
             if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
                 Best = Sol;
         }
-        else
-            cout << "Tabu solution found" << endl;
+        //else
+            //cout << "Tabu solution found" << endl;
         Sol.flipBit(i);
     }
     for (int i = 0; i < pairs.size(); i++) {
@@ -325,8 +326,8 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
             if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
                 Best = Sol;
         }
-        else 
-            cout << "Tabu solution found" << endl;
+        //else 
+            //cout << "Tabu solution found" << endl;
         Sol.swapBit(pairs[i]);
     }
     return Best;
