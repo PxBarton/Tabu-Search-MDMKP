@@ -35,9 +35,9 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 5;
+    int numRowsK = 20;
 
-    int numRowsD = 5;
+    int numRowsD = 10;
 
     ifstream inf;
 
@@ -127,7 +127,7 @@ int main()
     Solution solCopy = Sol; 
     cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
-    cout << Sol.calcZ(Prob);
+    cout << Sol.calcZ(Prob) << endl << endl;
 
     
 
@@ -141,6 +141,8 @@ int main()
     Init.K_Solution_Gen(26);
     //Init.generate();
 
+    Init.setMulti(10);
+
     Solution bestSol = Init;
     Solution nextSol = Init;
     Solution bestFeas = Init;
@@ -149,11 +151,13 @@ int main()
     Tabu.insertTabu(nextSol);
     int count = 0;
 
+    cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
+
     // set 'true' for Tabu search using Tabu list of hash vectors
     // set 'false' for local search without Tabu list
     bool useTabuList = true;
 
-    while (count < 100) {
+    while (count < 20) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);

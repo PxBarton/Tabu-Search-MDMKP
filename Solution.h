@@ -89,6 +89,10 @@ public:
 
 	int calcK();
 
+	int getMulti();
+
+	void setMulti(int multiplier);
+
 	void printSolution();
 
 	/**
@@ -115,6 +119,8 @@ private:
 	int zScore = 0;
 
 	int fitness = 0;
+
+	int multi = 1;
 
 
 };
@@ -249,7 +255,7 @@ int Solution::calcZ(ProblemCoefficients& coeff) {
 }
 
 int Solution::evalFit(ProblemCoefficients& coeff) {
-	fitness = this->calcZ(coeff) - penalty;
+	fitness = this->calcZ(coeff) - 10 * penalty;
 	return fitness;
 }
 
@@ -286,9 +292,18 @@ int Solution::calcK() {
 	return xItems.sum();
 }
 
+int Solution::getMulti() {
+	return multi;
+}
+
+void Solution::setMulti(int multiplier) {
+	multi = multiplier;
+}
+
 Solution& Solution::operator=(Solution& right) {
 	for (int i = 0; i < xLen; i++)
 		xItems[i] = right.getXval(i);
+	multi = right.getMulti();
 	return *this;
 }
 
