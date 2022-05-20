@@ -35,19 +35,19 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 20;
+    int numRowsK = 15;
 
-    int numRowsD = 10;
+    int numRowsD = 15;
 
     ifstream inf;
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "coeffs2/LHSknapsack2.txt";
-    string file2 = "coeffs2/LHSdemand2.txt";
-    string file3 = "coeffs2/RHSknapsack2.csv";
-    string file4 = "coeffs2/RHSdemand2.csv";
-    string file5 = "coeffs2/ObjCoeffs2.csv";
+    string file1 = "case11_3/LHSknapsack2.csv";
+    string file2 = "case11_3/LHSdemand11_3.csv";
+    string file3 = "case11_3/RHSknapsack11_3.csv";
+    string file4 = "case11_3/RHSdemand11_3.csv";
+    string file5 = "case11_3/ObjCoeffs11_3.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -118,6 +118,13 @@ int main()
     cout << "Objective Function Coeffs -------------------" << endl << endl;
     Prob.printC();
     cout << endl;
+    cout << "Knapsack RHS --------------------------------" << endl << endl;
+    Prob.printBk();
+    cout << endl;
+    cout << "Demand RHS ----------------------------------" << endl << endl;
+    Prob.printBd();
+    cout << endl;
+
 
     // generate a random solution, vector of 0's and 1's, length = numVars 
     //Sol.generate();
@@ -157,7 +164,7 @@ int main()
     // set 'false' for local search without Tabu list
     bool useTabuList = true;
 
-    while (count < 20) {
+    while (count < 100) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
@@ -203,7 +210,7 @@ int main()
                     Tabu.insertTabu(newSol);
                     if (newSol.isFeasible()) {
                         if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
-                            bestFeas = newSol;
+                            bestFeas = newSol;      // best feasible sol might be less than bestSol
                         cout << "feasible" << endl;
                     }
                     cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
@@ -228,7 +235,7 @@ int main()
         count++;
 
     }
-    cout << "best Z: " << bestSol.getZ() << endl;
+    cout << "best Z: " << bestSol.getZ() << endl;       // might be less than best feasible Z due to penalty
     bestFeas.violAmounts(Prob);
     if (bestFeas.isFeasible()) {
         cout << "best feasible Z: " << bestFeas.calcZ(Prob) << "      " << "k: " << bestFeas.calcK() << endl;
@@ -245,6 +252,7 @@ int main()
     else
         cout << endl << "Not using Tabu List" << endl;
     cout << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
+    //cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
 }
 
 //------------------------------------------------------------------------------

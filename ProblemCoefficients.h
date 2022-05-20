@@ -143,14 +143,14 @@ void ProblemCoefficients::printAd() {
 }
 
 void ProblemCoefficients::printBk() {
-	for (int i = 0; i < cLen; i++) {
+	for (int i = 0; i < RHS_knapsack.size(); i++) {
 		cout << RHS_knapsack[i] << ' ';
 	}
 	cout << endl << endl;
 }
 
 void ProblemCoefficients::printBd() {
-	for (int i = 0; i < cLen; i++) {
+	for (int i = 0; i < RHS_demand.size(); i++) {
 		cout << RHS_demand[i] << ' ';
 	}
 	cout << endl << endl;
