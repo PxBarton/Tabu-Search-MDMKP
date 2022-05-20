@@ -18,7 +18,7 @@ using namespace std;
 
 bool openFile(ifstream& file, string fileName);
 
-vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length);
+vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int numRows);
 
 vector<int> readCoeffs(ifstream &file, string fileName);
 
@@ -35,15 +35,15 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 15;
+    int numRowsK = 30;
 
-    int numRowsD = 15;
+    int numRowsD = 30;
 
     ifstream inf;
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "case11_3/LHSknapsack2.csv";
+    string file1 = "case11_3/LHSknapsack11_3.csv";
     string file2 = "case11_3/LHSdemand11_3.csv";
     string file3 = "case11_3/RHSknapsack11_3.csv";
     string file4 = "case11_3/RHSdemand11_3.csv";
@@ -76,8 +76,8 @@ int main()
     }
     
     // vectors to hold coefficients extracted from files
-    vector<vector<int>> Ak1 = readLHS(inf, file1, numVars);
-    vector<vector<int>> Ad1 = readLHS(inf, file2, numVars);
+    vector<vector<int>> Ak1 = readLHS(inf, file1, numVars, numRowsK);
+    vector<vector<int>> Ad1 = readLHS(inf, file2, numVars, numRowsD);
     vector<int> Bk1 = readCoeffs(inf, file3);
     vector<int> Bd1 = readCoeffs(inf, file4);
     vector<int> C = readCoeffs(inf, file5);
@@ -128,13 +128,15 @@ int main()
 
     // generate a random solution, vector of 0's and 1's, length = numVars 
     //Sol.generate();
-    Sol.K_Solution_Gen(5);
+    Sol.K_Solution_Gen(50);
     Sol.printSolution();
     cout << endl << Sol.getZ() << "  " << Sol.calcZ(Prob) << "  " << Sol.getZ() << endl;
     Solution solCopy = Sol; 
     cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
     cout << Sol.calcZ(Prob) << endl << endl;
+    Sol.violAmounts(Prob);
+    cout << Sol.getP() << endl << endl;
 
     
 
@@ -145,10 +147,10 @@ int main()
     auto start6 = chrono::high_resolution_clock::now();
 
     Solution Init(numVars);
-    Init.K_Solution_Gen(26);
-    //Init.generate();
+    //Init.K_Solution_Gen(26);
+    Init.generate();
 
-    Init.setMulti(10);
+    //Init.setMulti(10);
 
     Solution bestSol = Init;
     Solution nextSol = Init;
@@ -158,13 +160,13 @@ int main()
     Tabu.insertTabu(nextSol);
     int count = 0;
 
-    cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
+    //cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
 
     // set 'true' for Tabu search using Tabu list of hash vectors
     // set 'false' for local search without Tabu list
     bool useTabuList = true;
 
-    while (count < 100) {
+    while (count < 200) {
         Solution newSol(numVars);
         if (useTabuList == true) {
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
@@ -268,6 +270,7 @@ bool openFile(ifstream& file, string fileName) {
 }
 
 // extracts zero or more rows of LHS coefficients
+/*
 vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length) {
     vector<vector<int>> tempMatrix;
     vector<int> rowVector;
@@ -295,6 +298,7 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length) {
     LHSfile.close();
     return tempMatrix;
 }
+*/
 
 // extracts RHS and objective function coefficients
 vector<int> readCoeffs(ifstream &file, string fileName) {
@@ -377,7 +381,7 @@ Solution exploreSpacesNoTabu(Solution& Sol, ProblemCoefficients& coeffs, vector<
 
 // alternate version for extracting LHS coefficients from csv files
 // different signature and needs testing with txt files
-/*
+
 vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int numRows) {
     vector<vector<int>> tempMatrix;
     vector<int> rowVector;
@@ -402,7 +406,8 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int 
 
     LHSfile.close();
     return tempMatrix;
-*/
+
+}
 
 //--------------------------------------------------------------------------
 
