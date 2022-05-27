@@ -25,9 +25,7 @@ vector<int> readCoeffs(ifstream &file, string fileName);
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
     TabuList& tabuList, vector<vector<int>>& pairs, int multi);
 
-//Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
-
-int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
+vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
 
 int main()
 {
@@ -140,99 +138,29 @@ int main()
     
     
     /////////////////////////////////////////////////
-    // Tabu search algorithm 
-    // based on algorithm from Lai et al, 2019
+    // automating runs of tabu search algorithm
+    // experimenting with multiplier values and number of iterations
 
-    int multiplier = 100;
+    vector<int> multipliers = { 10, 100, 200, 1000 };
+    vector<int> iterCounts = { 10, 20, 50 };
+    vector<vector<int>> searchResults;
 
-    tabuSearch(Prob, Tabu, pairList, multiplier, 50);
+    //int multiplier = 100;
+    //tabuSearch(Prob, Tabu, pairList, multiplier, 50);
 
-    /*
-    auto start6 = chrono::high_resolution_clock::now();
-    
-    Solution Init(numVars);
-    int multiplier = 100;
-    //Init.K_Solution_Gen(26);
-    Init.generate();
+    for (int i = 0; i < multipliers.size(); i++)
+        for (int j = 0; j < iterCounts.size(); j++)
+            searchResults.push_back(tabuSearch(Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
 
-    Init.setMulti(multiplier);
+    cout << endl << "results:" << endl << endl;
+    for (int i = 0; i < multipliers.size(); i++)
+        for (int j = 0; j < iterCounts.size(); j++)
+            cout << multipliers[i] << "   " << iterCounts[j]
+            << "   " << searchResults[i + j + (i * 2)][0] 
+            << "   " << searchResults[i + j + (i * 2)][1] << endl;
 
-    Solution bestSol = Init;
-    Solution nextSol = Init;
-    Solution bestFeas = Init;
-    bestFeas.violAmounts(Prob);
-    Tabu.insertTabu(bestSol);
-    Tabu.insertTabu(nextSol);
-    int count = 0;
 
     
-
-        while (count < 50) {
-            Solution newSol(numVars);
-            newSol.setMulti(multiplier);
-            Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList, multiplier);
-            newSol = Result;
-       
-            newSol.violAmounts(Prob);
-            bestSol.violAmounts(Prob);
-            bestFeas.violAmounts(Prob);
-            if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
-                if (!Tabu.checkTabu(newSol)) {
-                    bestSol = newSol;
-                    nextSol = newSol;
-                    if (newSol.isFeasible()) {
-                        bestFeas = newSol;
-                        cout << "feasible" << endl;
-                    }
-                    Tabu.insertTabu(newSol);
-                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " "  << endl;
-                }
-                else
-                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
-          
-            
-
-        }
-            else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
-            
-                if (!Tabu.checkTabu(newSol)) {
-                    nextSol = newSol;
-                    Tabu.insertTabu(newSol);
-                    if (newSol.isFeasible()) {
-                        if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
-                            bestFeas = newSol;      // best feasible sol might be less than bestSol
-                        cout << "feasible" << endl;
-                    }
-                    cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
-                }
-                else 
-                    cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
-            
-        }
-        //else
-            //break;
-            //cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
-        cout << count << endl;
-        count++;
-
-        }
-        cout << "best Z: " << bestSol.getZ() << endl;       // might be less than best feasible Z due to penalty
-        bestFeas.violAmounts(Prob);
-        if (bestFeas.isFeasible()) {
-            cout << "best feasible Z: " << bestFeas.calcZ(Prob) << "      " << "k: " << bestFeas.calcK() << endl;
-            bestFeas.printSolution();
-        }
-        else
-            cout << "no feasible solution found" << endl;
-    
-
-    auto finish6 = chrono::high_resolution_clock::now();
-    auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
-    double result6 = ticks6.count() / 1000000.0;
-    
-    cout << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
-    cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
-    */
 }
 
 //------------------------------------------------------------------------------
@@ -287,11 +215,17 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
     return temp;
 }
 
-int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
+// solution-based tabu search algorithm 
+// based on algorithm from Lai et al, 2019
+vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
+    auto start = chrono::high_resolution_clock::now();
+    vector<int> returnVals = { 0, 0 };
+    tabuList.clearTabuList();
+
     Solution Init(100);
     int multiplier = 100;
-    //Init.K_Solution_Gen(26);
-    Init.generate();
+    Init.K_Solution_Gen(70);
+    //Init.generate();
 
     Init.setMulti(multiplier);
 
@@ -323,8 +257,10 @@ int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int
                 tabuList.insertTabu(newSol);
                 cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " " << endl;
             }
-            else
+            else {
+                nextSol = newSol;
                 cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " Tabu" << endl;
+            }
         }
         else if (newSol.evalFit(coeff) <= bestSol.evalFit(coeff)) {
 
@@ -338,8 +274,10 @@ int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int
                 }
                 cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << endl;
             }
-            else
+            else {
+                nextSol = newSol; 
                 cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " Tabu" << endl;
+            }
 
         }
 
@@ -347,15 +285,22 @@ int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int
         count++;
     }
     
+    auto finish = chrono::high_resolution_clock::now();
+    auto ticks = chrono::duration_cast<chrono::microseconds>(finish - start);
+    double result = ticks.count() / 1000000.0;
+    cout << "multiplier: " << multi << "    " << "iterations: " << iterations << "    " << "time in seconds : " << result << endl;
     cout << "best Z: " << bestSol.getZ() << endl;       
     bestFeas.violAmounts(coeff);
     if (bestFeas.isFeasible()) {
         cout << "best feasible Z: " << bestFeas.calcZ(coeff) << "      " << "k: " << bestFeas.calcK() << endl;
         bestFeas.printSolution();
-        return bestFeas.getZ();
+        returnVals[0] = bestFeas.getZ();
+        returnVals[1] = bestFeas.calcK();
+        return returnVals;
     }
     else
         cout << "no feasible solution found" << endl;
+    return returnVals;
 
 
 }
@@ -397,10 +342,6 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     return Best;
 }
 
-
-
-// alternate version for extracting LHS coefficients from csv files
-// different signature and needs testing with txt files
 
 
 
