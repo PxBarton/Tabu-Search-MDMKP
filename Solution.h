@@ -304,6 +304,7 @@ Solution& Solution::operator=(Solution& right) {
 	for (int i = 0; i < xLen; i++)
 		xItems[i] = right.getXval(i);
 	multi = right.getMulti();
+	zScore = right.getZ();
 	return *this;
 }
 

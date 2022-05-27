@@ -25,10 +25,9 @@ vector<int> readCoeffs(ifstream &file, string fileName);
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
     TabuList& tabuList, vector<vector<int>>& pairs, int multi);
 
-Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
+//Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
 
-
-//Solution K_Solution_Gen(int K);
+int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
 
 int main()
 {
@@ -139,13 +138,18 @@ int main()
     cout << Sol.getP() << endl << endl;
 
     
-
+    
     /////////////////////////////////////////////////
     // Tabu search algorithm 
     // based on algorithm from Lai et al, 2019
 
-    auto start6 = chrono::high_resolution_clock::now();
+    int multiplier = 100;
 
+    tabuSearch(Prob, Tabu, pairList, multiplier, 50);
+
+    /*
+    auto start6 = chrono::high_resolution_clock::now();
+    
     Solution Init(numVars);
     int multiplier = 100;
     //Init.K_Solution_Gen(26);
@@ -161,28 +165,18 @@ int main()
     Tabu.insertTabu(nextSol);
     int count = 0;
 
-    //cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
+    
 
-    // set 'true' for Tabu search using Tabu list of hash vectors
-    // set 'false' for local search without Tabu list
-    bool useTabuList = true;
-
-    while (count < 200) {
-        Solution newSol(numVars);
-        newSol.setMulti(multiplier);
-        if (useTabuList == true) {
+        while (count < 50) {
+            Solution newSol(numVars);
+            newSol.setMulti(multiplier);
             Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList, multiplier);
             newSol = Result;
-        }
-        else {
-            Solution Result = exploreSpacesNoTabu(nextSol, Prob, pairList);
-            newSol = Result;
-        }
-        newSol.violAmounts(Prob);
-        bestSol.violAmounts(Prob);
-        bestFeas.violAmounts(Prob);
-        if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
-            if (useTabuList == true) {
+       
+            newSol.violAmounts(Prob);
+            bestSol.violAmounts(Prob);
+            bestFeas.violAmounts(Prob);
+            if (newSol.evalFit(Prob) > bestSol.evalFit(Prob)) {
                 if (!Tabu.checkTabu(newSol)) {
                     bestSol = newSol;
                     nextSol = newSol;
@@ -191,24 +185,16 @@ int main()
                         cout << "feasible" << endl;
                     }
                     Tabu.insertTabu(newSol);
-                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
+                    cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " "  << endl;
                 }
                 else
                     cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
-            }
-            else {
-                bestSol = newSol;
-                nextSol = newSol;
-                if (newSol.isFeasible()) {
-                    bestFeas = newSol;
-                    cout << "feasible" << endl;
-                }
-                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
-            }
+          
+            
 
         }
-        else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
-            if (useTabuList == true) {
+            else if (newSol.evalFit(Prob) <= bestSol.evalFit(Prob)) {
+            
                 if (!Tabu.checkTabu(newSol)) {
                     nextSol = newSol;
                     Tabu.insertTabu(newSol);
@@ -221,16 +207,7 @@ int main()
                 }
                 else 
                     cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << " Tabu" << endl;
-            }
-            else {
-                nextSol = newSol;
-                if (newSol.isFeasible()) {
-                    if (newSol.evalFit(Prob) > bestFeas.evalFit(Prob))
-                        bestFeas = newSol;
-                    cout << "feasible" << endl;
-                }
-                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(Prob) << endl;
-            }
+            
         }
         //else
             //break;
@@ -238,25 +215,24 @@ int main()
         cout << count << endl;
         count++;
 
-    }
-    cout << "best Z: " << bestSol.getZ() << endl;       // might be less than best feasible Z due to penalty
-    bestFeas.violAmounts(Prob);
-    if (bestFeas.isFeasible()) {
-        cout << "best feasible Z: " << bestFeas.calcZ(Prob) << "      " << "k: " << bestFeas.calcK() << endl;
-        bestFeas.printSolution();
-    }
-    else
-        cout << "no feasible solution found" << endl;
+        }
+        cout << "best Z: " << bestSol.getZ() << endl;       // might be less than best feasible Z due to penalty
+        bestFeas.violAmounts(Prob);
+        if (bestFeas.isFeasible()) {
+            cout << "best feasible Z: " << bestFeas.calcZ(Prob) << "      " << "k: " << bestFeas.calcK() << endl;
+            bestFeas.printSolution();
+        }
+        else
+            cout << "no feasible solution found" << endl;
+    
 
     auto finish6 = chrono::high_resolution_clock::now();
     auto ticks6 = chrono::duration_cast<chrono::microseconds>(finish6 - start6);
     double result6 = ticks6.count() / 1000000.0;
-    if (useTabuList == true)
-        cout << endl << "Using Tabu List" << endl;
-    else
-        cout << endl << "Not using Tabu List" << endl;
+    
     cout << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
     cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
+    */
 }
 
 //------------------------------------------------------------------------------
@@ -271,36 +247,33 @@ bool openFile(ifstream& file, string fileName) {
     return(true);
 }
 
-// extracts zero or more rows of LHS coefficients
-/*
-vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length) {
+// extracts LHS coefficients
+vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int numRows) {
     vector<vector<int>> tempMatrix;
     vector<int> rowVector;
-    vector<int> tempRow;
-    string token;
+    string tempRow;
+    string line;
+    int rowCount = 0;
 
     openFile(LHSfile, fileName);
-    LHSfile.seekg(0, LHSfile.end);
-    int tokenCount = LHSfile.tellg();
-    LHSfile.seekg(0, LHSfile.beg);
-    int coeffCount = 0;
-    int numRows = tokenCount / length;
 
-    for (int i = 0; i < numRows; i++) {
-        while (LHSfile >> token && coeffCount < length) {
-            tempRow.push_back(stoi(token));
-            coeffCount++;
-            //cout << token << endl;
+    while (getline(LHSfile, line, '\r') && rowCount < numRows) {
+        string token;
+        stringstream sin(line);
+        rowVector.clear();
+        while (sin >> token) {
+            if (rowVector.size() < length)
+                rowVector.push_back(stoi(token));
         }
-        rowVector = tempRow;
         tempMatrix.push_back(rowVector);
-        tempRow.clear();
-        coeffCount = 0;
+        rowCount++;
+
     }
+
     LHSfile.close();
     return tempMatrix;
+
 }
-*/
 
 // extracts RHS and objective function coefficients
 vector<int> readCoeffs(ifstream &file, string fileName) {
@@ -314,6 +287,78 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
     return temp;
 }
 
+int tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
+    Solution Init(100);
+    int multiplier = 100;
+    //Init.K_Solution_Gen(26);
+    Init.generate();
+
+    Init.setMulti(multiplier);
+
+    Solution bestSol = Init;
+    Solution nextSol = Init;
+    Solution bestFeas = Init;
+    bestFeas.violAmounts(coeff);
+    tabuList.insertTabu(bestSol);
+    tabuList.insertTabu(nextSol);
+    int count = 0;
+
+    while (count < iterations) {
+        Solution newSol(100);
+        newSol.setMulti(multi);
+        Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
+        newSol = Result;
+
+        newSol.violAmounts(coeff);
+        bestSol.violAmounts(coeff);
+        bestFeas.violAmounts(coeff);
+        if (newSol.evalFit(coeff) > bestSol.evalFit(coeff)) {
+            if (!tabuList.checkTabu(newSol)) {
+                bestSol = newSol;
+                nextSol = newSol;
+                if (newSol.isFeasible()) {
+                    bestFeas = newSol;
+                    cout << "feasible" << endl;
+                }
+                tabuList.insertTabu(newSol);
+                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " " << endl;
+            }
+            else
+                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " Tabu" << endl;
+        }
+        else if (newSol.evalFit(coeff) <= bestSol.evalFit(coeff)) {
+
+            if (!tabuList.checkTabu(newSol)) {
+                nextSol = newSol;
+                tabuList.insertTabu(newSol);
+                if (newSol.isFeasible()) {
+                    if (newSol.evalFit(coeff) > bestFeas.evalFit(coeff))
+                        bestFeas = newSol;
+                    cout << "feasible" << endl;
+                }
+                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << endl;
+            }
+            else
+                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " Tabu" << endl;
+
+        }
+
+        cout << count << endl;
+        count++;
+    }
+    
+    cout << "best Z: " << bestSol.getZ() << endl;       
+    bestFeas.violAmounts(coeff);
+    if (bestFeas.isFeasible()) {
+        cout << "best feasible Z: " << bestFeas.calcZ(coeff) << "      " << "k: " << bestFeas.calcK() << endl;
+        bestFeas.printSolution();
+        return bestFeas.getZ();
+    }
+    else
+        cout << "no feasible solution found" << endl;
+
+
+}
 
 // performs the search of the flip space and swap space for a given solution
 // returning the best solution
@@ -352,65 +397,12 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     return Best;
 }
 
-// performs the search of the flip space and swap space for a given solution
-// returning the best solution
-// Tabu list disabled
-Solution exploreSpacesNoTabu(Solution& Sol, ProblemCoefficients& coeffs, vector<vector<int>>& pairs) {
 
-    int size = Sol.getLength();
-    Solution Best(size);
-    Best.clearSolution();
-
-    for (int i = 0; i < size; i++) {
-        Sol.flipBit(i);
-        Sol.violAmounts(coeffs);
-        Best.violAmounts(coeffs);
-        if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
-            Best = Sol;
-
-        Sol.flipBit(i);
-    }
-    for (int i = 0; i < pairs.size(); i++) {
-        Sol.swapBit(pairs[i]);
-        Sol.violAmounts(coeffs);
-        Best.violAmounts(coeffs);
-        if (Sol.evalFit(coeffs) > Best.evalFit(coeffs))
-            Best = Sol;
-
-        Sol.swapBit(pairs[i]);
-    }
-    return Best;
-}
 
 // alternate version for extracting LHS coefficients from csv files
 // different signature and needs testing with txt files
 
-vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int numRows) {
-    vector<vector<int>> tempMatrix;
-    vector<int> rowVector;
-    string tempRow;
-    string line;
-    int rowCount = 0;
 
-    openFile(LHSfile, fileName);
-
-    while (getline(LHSfile, line, '\r') && rowCount < numRows) {
-        string token;
-        stringstream sin(line);
-        rowVector.clear();
-        while (sin >> token) {
-            if (rowVector.size() < length)
-                rowVector.push_back(stoi(token));
-        }
-        tempMatrix.push_back(rowVector);
-        rowCount++;
-
-    }
-
-    LHSfile.close();
-    return tempMatrix;
-
-}
 
 //--------------------------------------------------------------------------
 
