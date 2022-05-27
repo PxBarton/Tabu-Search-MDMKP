@@ -255,7 +255,7 @@ int Solution::calcZ(ProblemCoefficients& coeff) {
 }
 
 int Solution::evalFit(ProblemCoefficients& coeff) {
-	fitness = this->calcZ(coeff) - 200 * penalty;
+	fitness = this->calcZ(coeff) - multi * penalty;
 	return fitness;
 }
 

@@ -22,8 +22,8 @@ vector<vector<int>> readLHS(ifstream& LHSfile, string fileName, int length, int 
 
 vector<int> readCoeffs(ifstream &file, string fileName);
 
-Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff, 
-    TabuList& tabuList, vector<vector<int>>& pairs);
+Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
+    TabuList& tabuList, vector<vector<int>>& pairs, int multi);
 
 Solution exploreSpacesNoTabu(Solution& solution, ProblemCoefficients& coeffs, vector<vector<int>>& pairs);
 
@@ -35,9 +35,9 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 30;
+    int numRowsK = 5;
 
-    int numRowsD = 30;
+    int numRowsD = 5;
 
     ifstream inf;
 
@@ -147,10 +147,11 @@ int main()
     auto start6 = chrono::high_resolution_clock::now();
 
     Solution Init(numVars);
+    int multiplier = 100;
     //Init.K_Solution_Gen(26);
     Init.generate();
 
-    //Init.setMulti(10);
+    Init.setMulti(multiplier);
 
     Solution bestSol = Init;
     Solution nextSol = Init;
@@ -168,8 +169,9 @@ int main()
 
     while (count < 200) {
         Solution newSol(numVars);
+        newSol.setMulti(multiplier);
         if (useTabuList == true) {
-            Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList);
+            Solution Result = exploreSpaces(nextSol, Prob, Tabu, pairList, multiplier);
             newSol = Result;
         }
         else {
@@ -254,7 +256,7 @@ int main()
     else
         cout << endl << "Not using Tabu List" << endl;
     cout << numRowsK << " and " << numRowsD << ": time in seconds : " << result6 << endl;
-    //cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
+    cout << "bestSol multiplier: " << bestSol.getMulti() << endl << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -316,11 +318,12 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
 // performs the search of the flip space and swap space for a given solution
 // returning the best solution
 // Tabu list enabled
-Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> &pairs) {
+Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tList, vector<vector<int>> &pairs, int multi) {
     
     int size = Sol.getLength();
     Solution Best(size);
     Best.clearSolution();
+    Best.setMulti(multi);
     
     for (int i = 0; i < size; i++) {
         Sol.flipBit(i);
