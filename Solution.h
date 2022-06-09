@@ -35,6 +35,13 @@ public:
 	void clearSolution();
 
 	/**
+	 * destructor
+	*/
+	~Solution();
+
+
+
+	/**
 	 * creates a list of all unique pairs of indices
 	 * where duplicates (x,y) = (y,x) are removed
 	 * for the purpose of swapping the values of a pair of indices
@@ -105,7 +112,7 @@ private:
 
 	int xLen;
 
-	valarray<int> xItems;
+	bool *xItems;
 
 
 	// vector<vector<int>> pairList; 
@@ -125,8 +132,13 @@ private:
 
 };
 
-Solution::Solution(int n): xItems(n), xLen(n) {
-	//xLen = n;
+Solution::Solution(int n) {
+	xLen = n;
+	xItems = new bool[n];
+}
+
+Solution::~Solution() {
+	delete[] xItems;
 }
 
 void Solution::generate() {
@@ -223,20 +235,20 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 	//vector<int> violArray((kRows + dRows), 0);
 
 	for (int i = 0; i < coeff.getBk().size(); i++) {
-		if (inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) < coeff.getBk()[i])
+		if (inner_product(xItems, xItems+100, coeff.getAk()[i].begin(), 0) < coeff.getBk()[i])
 			//	violArray[i] = 0;
 			penalty += 0;
 		else
 			//	violArray[i] = inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
-			penalty += inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
+			penalty += inner_product(xItems, xItems+100, coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
 	}
 	for (int j = 0; j < coeff.getBd().size(); j++) {
-		if (inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0) > coeff.getBd()[j])
+		if (inner_product(xItems, xItems+100, coeff.getAd()[j].begin(), 0) > coeff.getBd()[j])
 			//violArray[kRows + j] = 0;
 			penalty += 0;
 		else
 			//violArray[kRows + j] = coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
-			penalty += coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
+			penalty += coeff.getBd()[j] - inner_product(xItems, xItems+100, coeff.getAd()[j].begin(), 0);
 	}
 	//penalty = accumulate(violArray.begin(), violArray.end(), 0);
 	if (penalty == 0)
@@ -247,7 +259,7 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 
 int Solution::calcZ(ProblemCoefficients& coeff) {
 	int z;
-	z = inner_product(begin(xItems), end(xItems), coeff.getC().begin(), 0);
+	z = inner_product(xItems, xItems+100, coeff.getC().begin(), 0);
 	zScore = z;
 	return z;
 	
@@ -289,7 +301,10 @@ int Solution::getP() {
 }
 
 int Solution::calcK() {
-	return xItems.sum();
+	int sum = 0;
+	for (int i = 0; i < xLen; i++)
+		sum += xItems[i];
+	return sum;
 }
 
 int Solution::getMulti() {

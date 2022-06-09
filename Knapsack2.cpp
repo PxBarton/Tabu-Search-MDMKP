@@ -32,19 +32,19 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 5;
+    int numRowsK = 30;
 
-    int numRowsD = 5;
+    int numRowsD = 30;
 
     ifstream inf;
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "case11_3/LHSknapsack11_3.csv";
-    string file2 = "case11_3/LHSdemand11_3.csv";
-    string file3 = "case11_3/RHSknapsack11_3.csv";
-    string file4 = "case11_3/RHSdemand11_3.csv";
-    string file5 = "case11_3/ObjCoeffs11_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_1_6/LHSknapsack_1_6.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_1_6/LHSdemand_1_6.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_1_6/RHSknapsack_1_6.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_1_6/RHSdemand_1_6.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_1_6/ObjCoeffs_1_6.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -85,12 +85,12 @@ int main()
     Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C, numRowsK, numRowsD);
 
     // create a Solution object 
-    Solution Sol(numVars);
+    Solution Sol1(numVars);
     
 
     // generate a list of all the pairs of indices of a solution 
     // to explore the swap space (pairList size is 'n choose 2')
-    vector<vector<int>> pairList = Sol.createPairList();
+    vector<vector<int>> pairList = Sol1.createPairList();
     cout << "no. pairs: " << pairList.size() << endl << endl;
 
     // create the empty Tabu list using three hash vectors of length l
@@ -101,7 +101,7 @@ int main()
     int l = 100000000;
 
     TabuList Tabu(l, y1, y2, y3);
-    cout << endl << "solution tabu? " << Tabu.checkTabu(Sol) << endl;
+    cout << endl << "solution tabu? " << Tabu.checkTabu(Sol1) << endl;
 
     cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
     cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
@@ -125,15 +125,15 @@ int main()
 
     // generate a random solution, vector of 0's and 1's, length = numVars 
     //Sol.generate();
-    Sol.K_Solution_Gen(50);
-    Sol.printSolution();
-    cout << endl << Sol.getZ() << "  " << Sol.calcZ(Prob) << "  " << Sol.getZ() << endl;
-    Solution solCopy = Sol; 
+    Sol1.K_Solution_Gen(5);
+    Sol1.printSolution();
+    cout << endl << Sol1.getZ() << "  " << Sol1.calcZ(Prob) << "  " << Sol1.getZ() << endl;
+    Solution solCopy = Sol1; 
     cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
-    cout << Sol.calcZ(Prob) << endl << endl;
-    Sol.violAmounts(Prob);
-    cout << Sol.getP() << endl << endl;
+    cout << Sol1.calcZ(Prob) << endl << endl;
+    Sol1.violAmounts(Prob);
+    cout << Sol1.getP() << endl << endl;
 
     
     
@@ -142,8 +142,9 @@ int main()
     // experimenting with multiplier values and number of iterations
 
     vector<int> multipliers = { 10, 100, 200, 1000 };
-    vector<int> iterCounts = { 10, 20, 50 };
+    vector<int> iterCounts = { 5, 100, 300 };
     vector<vector<int>> searchResults;
+    Solution Initial(100);
 
     //int multiplier = 100;
     //tabuSearch(Prob, Tabu, pairList, multiplier, 50);
@@ -222,9 +223,10 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     vector<int> returnVals = { 0, 0 };
     tabuList.clearTabuList();
 
+    //Solution *Init = new Solution(100);
     Solution Init(100);
-    int multiplier = 100;
-    Init.K_Solution_Gen(70);
+    int multiplier = multi;
+    Init.K_Solution_Gen(25);
     //Init.generate();
 
     Init.setMulti(multiplier);
@@ -238,7 +240,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     int count = 0;
 
     while (count < iterations) {
-        Solution newSol(100);
+        Solution newSol = Init;
         newSol.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
         newSol = Result;
@@ -296,10 +298,12 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
         bestFeas.printSolution();
         returnVals[0] = bestFeas.getZ();
         returnVals[1] = bestFeas.calcK();
+        //delete Init;
         return returnVals;
     }
     else
         cout << "no feasible solution found" << endl;
+    //delete Init;
     return returnVals;
 
 
