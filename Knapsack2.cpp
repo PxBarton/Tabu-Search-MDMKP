@@ -144,7 +144,7 @@ int main()
     vector<int> multipliers = { 10, 100, 200, 1000 };
     vector<int> iterCounts = { 5, 100, 300 };
     vector<vector<int>> searchResults;
-    Solution Initial(100);
+    //Solution Initial(100);
 
     //int multiplier = 100;
     //tabuSearch(Prob, Tabu, pairList, multiplier, 50);
@@ -240,7 +240,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     int count = 0;
 
     while (count < iterations) {
-        Solution newSol = Init;
+        Solution newSol(100);
         newSol.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
         newSol = Result;
