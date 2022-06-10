@@ -40,11 +40,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "case11_3/LHSknapsack11_3.csv";
-    string file2 = "case11_3/LHSdemand11_3.csv";
-    string file3 = "case11_3/RHSknapsack11_3.csv";
-    string file4 = "case11_3/RHSdemand11_3.csv";
-    string file5 = "case11_3/ObjCoeffs11_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_2_3/LHSknapsack_2_3.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_2_3/LHSdemand_2_3.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_2_3/RHSknapsack_2_3.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_2_3/RHSdemand_2_3.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_2_3/ObjCoeffs_2_3.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
