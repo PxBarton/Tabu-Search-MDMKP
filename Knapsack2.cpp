@@ -233,9 +233,12 @@ vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tab
 
     init.setMulti(multiplier);
 
-    Solution bestSol = init;
-    Solution nextSol = init;
-    Solution bestFeas = init;
+    Solution bestSol(100);
+    bestSol = init;
+    Solution nextSol(100);
+    nextSol = init;
+    Solution bestFeas(100);
+    bestFeas = init;
     bestFeas.violAmounts(coeff);
     tabuList.insertTabu(bestSol);
     tabuList.insertTabu(nextSol);
@@ -245,8 +248,11 @@ vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tab
     while (count < iterations) {
         //Solution newSol = init;
         //newSol.setMulti(multi);
+        //Solution Result(100);
+        //Result.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
-        Solution newSol = Result;
+        Solution newSol(100);
+        newSol = Result;
         
         newSol.violAmounts(coeff);
         bestSol.violAmounts(coeff);

@@ -135,10 +135,12 @@ private:
 Solution::Solution(int n) {
 	xLen = n;
 	xItems = new bool[n];
+	for (int i = 0; i < xLen; i++)
+		xItems[i] = 0;
 }
 
 Solution::~Solution() {
-	delete[] xItems;
+	delete[]xItems;
 }
 
 void Solution::generate() {
@@ -155,8 +157,6 @@ void Solution::generate() {
 
 void Solution::K_Solution_Gen(int K) {
 	int index;
-	for (int i = 0; i < xLen; i++)
-		xItems[i] = 0;
 	default_random_engine gen;
 	gen.seed(chrono::system_clock::now().time_since_epoch().count());
 	uniform_int_distribution<int> dis(0, 100);
