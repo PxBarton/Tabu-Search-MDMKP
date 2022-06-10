@@ -32,19 +32,19 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 5;
+    int numRowsK = 30;
 
-    int numRowsD = 5;
+    int numRowsD = 30;
 
     ifstream inf;
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_2_3/LHSknapsack_2_3.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_2_3/LHSdemand_2_3.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_2_3/RHSknapsack_2_3.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_2_3/RHSdemand_2_3.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_2_3/ObjCoeffs_2_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_2_6/LHSknapsack_2_6.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_2_6/LHSdemand_2_6.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_2_6/RHSknapsack_2_6.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_2_6/RHSdemand_2_6.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_2_6/ObjCoeffs_2_6.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -142,7 +142,7 @@ int main()
     // experimenting with multiplier values and number of iterations
 
     vector<int> multipliers = { 10, 100, 200, 1000 };
-    vector<int> iterCounts = { 10, 20, 50 };
+    vector<int> iterCounts = { 50, 100, 300 };
     vector<vector<int>> searchResults;
 
     //int multiplier = 100;
@@ -224,7 +224,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
 
     Solution Init(100);
     int multiplier = 100;
-    Init.K_Solution_Gen(70);
+    Init.K_Solution_Gen(26);
     //Init.generate();
 
     Init.setMulti(multiplier);
