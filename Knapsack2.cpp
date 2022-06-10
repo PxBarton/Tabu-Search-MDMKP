@@ -25,16 +25,16 @@ vector<int> readCoeffs(ifstream &file, string fileName);
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
     TabuList& tabuList, vector<vector<int>>& pairs, int multi);
 
-vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
+vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
 
 int main()
 {
     
     int numVars = 100;
 
-    int numRowsK = 30;
+    int numRowsK = 10;
 
-    int numRowsD = 30;
+    int numRowsD = 10;
 
     ifstream inf;
 
@@ -85,12 +85,12 @@ int main()
     Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C, numRowsK, numRowsD);
 
     // create a Solution object 
-    Solution Sol1(numVars);
+    Solution *Sol1 = new Solution(numVars);
     
 
     // generate a list of all the pairs of indices of a solution 
     // to explore the swap space (pairList size is 'n choose 2')
-    vector<vector<int>> pairList = Sol1.createPairList();
+    vector<vector<int>> pairList = Sol1->createPairList();
     cout << "no. pairs: " << pairList.size() << endl << endl;
 
     // create the empty Tabu list using three hash vectors of length l
@@ -101,7 +101,7 @@ int main()
     int l = 100000000;
 
     TabuList Tabu(l, y1, y2, y3);
-    cout << endl << "solution tabu? " << Tabu.checkTabu(Sol1) << endl;
+    cout << endl << "solution tabu? " << Tabu.checkTabu(*Sol1) << endl;
 
     cout << endl << "RHS knapsack rows in file: " << Bk1.size() << endl;
     cout << endl << "RHS demand rows in file: " << Bd1.size() << endl;
@@ -125,15 +125,17 @@ int main()
 
     // generate a random solution, vector of 0's and 1's, length = numVars 
     //Sol.generate();
-    Sol1.K_Solution_Gen(5);
-    Sol1.printSolution();
-    cout << endl << Sol1.getZ() << "  " << Sol1.calcZ(Prob) << "  " << Sol1.getZ() << endl;
-    Solution solCopy = Sol1; 
+    Sol1->K_Solution_Gen(5);
+    Sol1->printSolution();
+    cout << endl << Sol1->getZ() << "  " << Sol1->calcZ(Prob) << "  " << Sol1->getZ() << endl;
+    Solution solCopy = *Sol1; 
     cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
-    cout << Sol1.calcZ(Prob) << endl << endl;
-    Sol1.violAmounts(Prob);
-    cout << Sol1.getP() << endl << endl;
+    cout << Sol1->calcZ(Prob) << endl << endl;
+    Sol1->violAmounts(Prob);
+    cout << Sol1->getP() << endl << endl;
+
+    delete(Sol1);
 
     
     
@@ -144,14 +146,14 @@ int main()
     vector<int> multipliers = { 10, 100, 200, 1000 };
     vector<int> iterCounts = { 5, 100, 300 };
     vector<vector<int>> searchResults;
-    //Solution Initial(100);
+    Solution Start(100);
 
     //int multiplier = 100;
     //tabuSearch(Prob, Tabu, pairList, multiplier, 50);
 
     for (int i = 0; i < multipliers.size(); i++)
         for (int j = 0; j < iterCounts.size(); j++)
-            searchResults.push_back(tabuSearch(Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
+            searchResults.push_back(tabuSearch(Start, Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
 
     cout << endl << "results:" << endl << endl;
     for (int i = 0; i < multipliers.size(); i++)
@@ -218,33 +220,34 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
 
 // solution-based tabu search algorithm 
 // based on algorithm from Lai et al, 2019
-vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
+vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
     auto start = chrono::high_resolution_clock::now();
     vector<int> returnVals = { 0, 0 };
     tabuList.clearTabuList();
 
     //Solution *Init = new Solution(100);
-    Solution Init(100);
+    //Solution Init(100);
     int multiplier = multi;
-    Init.K_Solution_Gen(25);
+    init.K_Solution_Gen(25);
     //Init.generate();
 
-    Init.setMulti(multiplier);
+    init.setMulti(multiplier);
 
-    Solution bestSol = Init;
-    Solution nextSol = Init;
-    Solution bestFeas = Init;
+    Solution bestSol = init;
+    Solution nextSol = init;
+    Solution bestFeas = init;
     bestFeas.violAmounts(coeff);
     tabuList.insertTabu(bestSol);
     tabuList.insertTabu(nextSol);
     int count = 0;
+    cout << "here" << endl;
 
     while (count < iterations) {
-        Solution newSol(100);
-        newSol.setMulti(multi);
+        //Solution newSol = init;
+        //newSol.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
-        newSol = Result;
-
+        Solution newSol = Result;
+        
         newSol.violAmounts(coeff);
         bestSol.violAmounts(coeff);
         bestFeas.violAmounts(coeff);
@@ -318,7 +321,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     Solution Best(size);
     Best.clearSolution();
     Best.setMulti(multi);
-    
+    cout << "here" << endl;
     for (int i = 0; i < size; i++) {
         Sol.flipBit(i);
         if (!tList.checkTabu(Sol)) {
