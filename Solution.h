@@ -146,7 +146,7 @@ void Solution::K_Solution_Gen(int K) {
 	bool filled = false;
 	default_random_engine gen;
 	gen.seed(chrono::system_clock::now().time_since_epoch().count());
-	uniform_int_distribution<int> dis(0, 100);
+	uniform_int_distribution<int> dis(0, 99);
 	for (int i = 0; i < K; i++) {
 		index = dis(gen);
 		if (xItems[index] == 0)

@@ -40,11 +40,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_2_6/LHSknapsack_2_6.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_2_6/LHSdemand_2_6.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_2_6/RHSknapsack_2_6.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_2_6/RHSdemand_2_6.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_2_6/ObjCoeffs_2_6.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_3_3/LHSknapsack_3_3.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_3_3/LHSdemand_3_3.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_3_3/RHSknapsack_3_3.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_3_3/RHSdemand_3_3.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_3_3/ObjCoeffs_3_3.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -238,7 +238,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     int count = 0;
 
     while (count < iterations) {
-        Solution newSol(100);
+        Solution newSol = Init;
         newSol.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
         newSol = Result;
