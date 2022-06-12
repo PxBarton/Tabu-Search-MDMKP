@@ -40,11 +40,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_3_3/LHSknapsack_3_3.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_3_3/LHSdemand_3_3.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_3_3/RHSknapsack_3_3.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_3_3/RHSdemand_3_3.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_3_3/ObjCoeffs_3_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_3_6/LHSknapsack_3_6.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_3_6/LHSdemand_3_6.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_3_6/RHSknapsack_3_6.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_3_6/RHSdemand_3_6.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_3_6/ObjCoeffs_3_6.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -326,7 +326,7 @@ Solution exploreSpaces(Solution& Sol, ProblemCoefficients& coeffs, TabuList& tLi
     Solution Best(size);
     Best.clearSolution();
     Best.setMulti(multi);
-    cout << "here" << endl;
+    //cout << "here" << endl;
     for (int i = 0; i < size; i++) {
         Sol.flipBit(i);
         if (!tList.checkTabu(Sol)) {
