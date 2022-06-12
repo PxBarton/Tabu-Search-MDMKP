@@ -64,7 +64,7 @@ public:
 	void swapBit(vector<int>& pair);
 
 	/**
-	 * calculates the z-score of a paricular solution
+	 * calculates the objective function value of a paricular solution
 	 */
 	int calcZ(ProblemCoefficients& coeff);
 
@@ -235,21 +235,21 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 	penalty = 0;
 	//vector<int> violArray((kRows + dRows), 0);
 
-	for (int i = 0; i < coeff.getBk().size(); i++) {
-		if (inner_product(xItems, xItems+100, coeff.getAk()[i].begin(), 0) < coeff.getBk()[i])
+	for (int i = 0; i < coeff.getKRows(); i++) {
+		if (inner_product(xItems, xItems+100, coeff.getAk()[i], 0) < coeff.getBk()[i])
 			//	violArray[i] = 0;
 			penalty += 0;
 		else
 			//	violArray[i] = inner_product(begin(xItems), end(xItems), coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
-			penalty += inner_product(xItems, xItems+100, coeff.getAk()[i].begin(), 0) - coeff.getBk()[i];
+			penalty += inner_product(xItems, xItems+100, coeff.getAk()[i], 0) - coeff.getBk()[i];
 	}
-	for (int j = 0; j < coeff.getBd().size(); j++) {
-		if (inner_product(xItems, xItems+100, coeff.getAd()[j].begin(), 0) > coeff.getBd()[j])
+	for (int j = 0; j < coeff.getDRows(); j++) {
+		if (inner_product(xItems, xItems+100, coeff.getAd()[j], 0) > coeff.getBd()[j])
 			//violArray[kRows + j] = 0;
 			penalty += 0;
 		else
 			//violArray[kRows + j] = coeff.getBd()[j] - inner_product(begin(xItems), end(xItems), coeff.getAd()[j].begin(), 0);
-			penalty += coeff.getBd()[j] - inner_product(xItems, xItems+100, coeff.getAd()[j].begin(), 0);
+			penalty += coeff.getBd()[j] - inner_product(xItems, xItems+100, coeff.getAd()[j], 0);
 	}
 	//penalty = accumulate(violArray.begin(), violArray.end(), 0);
 	if (penalty == 0)
@@ -260,7 +260,7 @@ void Solution::violAmounts(ProblemCoefficients& coeff) {
 
 int Solution::calcZ(ProblemCoefficients& coeff) {
 	int z;
-	z = inner_product(xItems, xItems+100, coeff.getC().begin(), 0);
+	z = inner_product(xItems, xItems+100, coeff.getC(), 0);
 	zScore = z;
 	return z;
 	

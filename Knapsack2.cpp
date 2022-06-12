@@ -32,19 +32,19 @@ int main()
     
     int numVars = 100;
 
-    int numRowsK = 10;
+    int numRowsK = 30;
 
-    int numRowsD = 10;
+    int numRowsD = 30;
 
     ifstream inf;
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_1_6/LHSknapsack_1_6.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_1_6/LHSdemand_1_6.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_1_6/RHSknapsack_1_6.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_1_6/RHSdemand_1_6.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_1_6/ObjCoeffs_1_6.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_1_3/LHSknapsack_1_3.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_1_3/LHSdemand_1_3.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_1_3/RHSknapsack_1_3.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_1_3/RHSdemand_1_3.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_1_3/ObjCoeffs_1_3.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -81,8 +81,8 @@ int main()
 
     // create a ProblemCoefficients object to store the MDMKP coeff's
     // populate with the coefficients extracted from files
-    ProblemCoefficients Prob;
-    Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C, numRowsK, numRowsD);
+    ProblemCoefficients Prob(numVars, numRowsK, numRowsD);
+    Prob.loadCoeffs(Ak1, Ad1, Bk1, Bd1, C);
 
     // create a Solution object 
     Solution *Sol1 = new Solution(numVars);
@@ -127,11 +127,11 @@ int main()
     //Sol.generate();
     Sol1->K_Solution_Gen(5);
     Sol1->printSolution();
-    cout << endl << Sol1->getZ() << "  " << Sol1->calcZ(Prob) << "  " << Sol1->getZ() << endl;
+    cout << endl << Sol1->getZ() << "  " << "  "  << endl;
     Solution solCopy = *Sol1; 
     cout << solCopy.getZ() << "  " << solCopy.calcZ(Prob) << "  " << solCopy.getZ() << endl << endl;
 
-    cout << Sol1->calcZ(Prob) << endl << endl;
+    cout << Sol1->getZ() << endl << endl;
     Sol1->violAmounts(Prob);
     cout << Sol1->getP() << endl << endl;
 
@@ -143,14 +143,15 @@ int main()
     // automating runs of tabu search algorithm
     // experimenting with multiplier values and number of iterations
 
-    vector<int> multipliers = { 10, 100, 200, 1000 };
-    vector<int> iterCounts = { 5, 100, 300 };
+    vector<int> multipliers = { 10, 100, 200};
+    vector<int> iterCounts = { 5, 10, 20 };
     vector<vector<int>> searchResults;
     Solution Start(100);
 
-    //int multiplier = 100;
-    //tabuSearch(Prob, Tabu, pairList, multiplier, 50);
+    int multiplier = 10;
+    tabuSearch(Start, Prob, Tabu, pairList, multiplier, 500);
 
+    /*
     for (int i = 0; i < multipliers.size(); i++)
         for (int j = 0; j < iterCounts.size(); j++)
             searchResults.push_back(tabuSearch(Start, Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
@@ -161,6 +162,7 @@ int main()
             cout << multipliers[i] << "   " << iterCounts[j]
             << "   " << searchResults[i + j + (i * 2)][0] 
             << "   " << searchResults[i + j + (i * 2)][1] << endl;
+    */
 
 
     
