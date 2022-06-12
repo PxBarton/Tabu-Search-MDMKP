@@ -25,7 +25,7 @@ vector<int> readCoeffs(ifstream &file, string fileName);
 Solution exploreSpaces(Solution& solution, ProblemCoefficients& coeff,
     TabuList& tabuList, vector<vector<int>>& pairs, int multi);
 
-vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
+vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations);
 
 int main()
 {
@@ -146,15 +146,15 @@ int main()
     vector<int> multipliers = { 10, 100, 200};
     vector<int> iterCounts = { 5, 10, 20 };
     vector<vector<int>> searchResults;
-    Solution Start(100);
+    //Solution Start(100);
 
-    int multiplier = 10;
-    tabuSearch(Start, Prob, Tabu, pairList, multiplier, 500);
+    //int multiplier = 10;
+    //tabuSearch(Start, Prob, Tabu, pairList, multiplier, 500);
 
-    /*
+    
     for (int i = 0; i < multipliers.size(); i++)
         for (int j = 0; j < iterCounts.size(); j++)
-            searchResults.push_back(tabuSearch(Start, Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
+            searchResults.push_back(tabuSearch(Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
 
     cout << endl << "results:" << endl << endl;
     for (int i = 0; i < multipliers.size(); i++)
@@ -162,7 +162,7 @@ int main()
             cout << multipliers[i] << "   " << iterCounts[j]
             << "   " << searchResults[i + j + (i * 2)][0] 
             << "   " << searchResults[i + j + (i * 2)][1] << endl;
-    */
+    
 
 
     
@@ -222,25 +222,25 @@ vector<int> readCoeffs(ifstream &file, string fileName) {
 
 // solution-based tabu search algorithm 
 // based on algorithm from Lai et al, 2019
-vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
+vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<vector<int>>& pairs, int multi, int iterations) {
     auto start = chrono::high_resolution_clock::now();
     vector<int> returnVals = { 0, 0 };
     tabuList.clearTabuList();
 
     //Solution *Init = new Solution(100);
-    //Solution Init(100);
+    Solution Init(100);
     int multiplier = multi;
-    init.K_Solution_Gen(25);
+    Init.K_Solution_Gen(25);
     //Init.generate();
 
-    init.setMulti(multiplier);
+    Init.setMulti(multiplier);
 
-    Solution bestSol(100);
-    bestSol = init;
-    Solution nextSol(100);
-    nextSol = init;
-    Solution bestFeas(100);
-    bestFeas = init;
+    Solution bestSol(Init);
+    //bestSol = init;
+    Solution nextSol(Init);
+    //nextSol = init;
+    Solution bestFeas(Init);
+    //bestFeas = init;
     bestFeas.violAmounts(coeff);
     tabuList.insertTabu(bestSol);
     tabuList.insertTabu(nextSol);
@@ -251,9 +251,9 @@ vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tab
         //Solution newSol = init;
         //newSol.setMulti(multi);
         //Solution Result(100);
-        Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
-        Solution newSol(100);
-        newSol = Result;
+        Solution Result(exploreSpaces(nextSol, coeff, tabuList, pairs, multi));
+        Solution newSol(Result);
+        //newSol = Result;
         
         newSol.violAmounts(coeff);
         bestSol.violAmounts(coeff);

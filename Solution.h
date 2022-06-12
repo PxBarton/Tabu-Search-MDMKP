@@ -19,6 +19,8 @@ public:
 
 	Solution(int n);
 
+	Solution(const Solution& arg);
+
 	/**
 	 * generates a random solution using default_random_engine
 	 */
@@ -92,7 +94,7 @@ public:
 	 */
 	int getXval(int index);
 
-	int getLength();
+	int getLength() const;
 
 	int calcK();
 
@@ -137,6 +139,13 @@ Solution::Solution(int n) {
 	xItems = new bool[n];
 	for (int i = 0; i < xLen; i++)
 		xItems[i] = 0;
+}
+
+Solution::Solution(const Solution& arg) {
+	xLen = arg.getLength();
+	xItems = new bool[xLen];
+	for (int i = 0; i < xLen; i++)
+		xItems[i] = arg.xItems[i];
 }
 
 Solution::~Solution() {
@@ -279,7 +288,7 @@ bool Solution::isFeasible() {
 		return false;
 }
 
-int Solution::getLength() {
+int Solution::getLength() const{
 	return xLen;
 }
 
