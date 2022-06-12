@@ -251,7 +251,6 @@ vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tab
         //Solution newSol = init;
         //newSol.setMulti(multi);
         //Solution Result(100);
-        //Result.setMulti(multi);
         Solution Result = exploreSpaces(nextSol, coeff, tabuList, pairs, multi);
         Solution newSol(100);
         newSol = Result;
@@ -309,12 +308,10 @@ vector<int> tabuSearch(Solution& init, ProblemCoefficients& coeff, TabuList& tab
         bestFeas.printSolution();
         returnVals[0] = bestFeas.getZ();
         returnVals[1] = bestFeas.calcK();
-        //delete Init;
         return returnVals;
     }
     else
         cout << "no feasible solution found" << endl;
-    //delete Init;
     return returnVals;
 
 
