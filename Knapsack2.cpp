@@ -40,11 +40,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_4_3/LHSknapsack_4_3.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_4_3/LHSdemand_4_3.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_4_3/RHSknapsack_4_3.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_4_3/RHSdemand_4_3.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_4_3/ObjCoeffs_4_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_11_3/LHSknapsack_11_3.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_11_3/LHSdemand_11_3.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_11_3/RHSknapsack_11_3.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_11_3/RHSdemand_11_3.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_11_3/ObjCoeffs_11_3.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -143,8 +143,8 @@ int main()
     // automating runs of tabu search algorithm
     // experimenting with multiplier values and number of iterations
 
-    vector<int> multipliers = { 10, 100, 200, 1000};
-    vector<int> iterCounts = { 100, 500, 1000 };
+    vector<int> multipliers = {100 };
+    vector<int> iterCounts = { 3000 };
     vector<vector<int>> searchResults;
     //Solution Start(100);
 
@@ -230,7 +230,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     //Solution *Init = new Solution(100);
     Solution Init(100);
     int multiplier = multi;
-    Init.K_Solution_Gen(25);
+    Init.K_Solution_Gen(70);
     //Init.generate();
 
     Init.setMulti(multiplier);
