@@ -146,6 +146,9 @@ Solution::Solution(const Solution& arg) {
 	xItems = new bool[xLen];
 	for (int i = 0; i < xLen; i++)
 		xItems[i] = arg.xItems[i];
+	multi = arg.multi;
+	zScore = arg.zScore;
+
 }
 
 Solution::~Solution() {
