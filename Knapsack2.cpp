@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <valarray>
+#include <array>
 #include <chrono>
 #include <random>
 #include "ProblemCoefficients.h"
@@ -40,11 +41,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_7_6/LHSknapsack_7_6.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_7_6/LHSdemand_7_6.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_7_6/RHSknapsack_7_6.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_7_6/RHSdemand_7_6.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_7_6/ObjCoeffs_7_6.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_8_6/LHSknapsack_8_6.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_8_6/LHSdemand_8_6.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_8_6/RHSknapsack_8_6.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_8_6/RHSdemand_8_6.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_8_6/ObjCoeffs_8_6.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -143,25 +144,43 @@ int main()
     // automating runs of tabu search algorithm
     // experimenting with multiplier values and number of iterations
 
-    vector<int> multipliers = {10, 100, 200, 1000 };
-    vector<int> iterCounts = {100, 500, 1000 };
-    vector<vector<int>> searchResults;
-    //Solution Start(100);
+    vector<int> multipliers = {10, 100, 200, 1000};
+    vector<int> iterCounts = {100, 500, 1000};
+    
+    // create a matrix of 2-tuples
+    // populate with zeros
+    vector<vector<vector<int>>> resultsMatrix;
+    vector<int> initResults = { 0, 0 };
+    // create a column of 2-tuples
+    vector<vector<int>> initMatrixCol;
+    for (int row = 0; row < iterCounts.size(); row++)
+        initMatrixCol.push_back(initResults);
+    // fill matrix with columns of 2-tuples
+    for (int col = 0; col < multipliers.size(); col++)
+        resultsMatrix.push_back(initMatrixCol);
+    
+    /*
+    * prints the empty matrix of 2-tuples, one entry per line
+    * 
+    for (int i = 0; i < multipliers.size(); i++)
+        for (int j = 0; j < iterCounts.size(); j++)
+            cout << resultsMatrix[i][j][0] << " " << resultsMatrix[i][j][1] << endl;
+    */
 
     //int multiplier = 10;
     //tabuSearch(Start, Prob, Tabu, pairList, multiplier, 500);
 
     
     for (int i = 0; i < multipliers.size(); i++)
-        for (int j = 0; j < iterCounts.size(); j++)
-            searchResults.push_back(tabuSearch(Prob, Tabu, pairList, multipliers[i], iterCounts[j]));
+        for (int j = 0; j < iterCounts.size(); j++) 
+            resultsMatrix[i][j] = tabuSearch(Prob, Tabu, pairList, multipliers[i], iterCounts[j]);
+         
 
-    cout << endl << "results:" << endl << endl;
     for (int i = 0; i < multipliers.size(); i++)
         for (int j = 0; j < iterCounts.size(); j++)
-            cout << multipliers[i] << "   " << iterCounts[j]
-            << "   " << searchResults[i + j + (i * 2)][0] 
-            << "   " << searchResults[i + j + (i * 2)][1] << endl;
+            cout << multipliers[i] << "    " << iterCounts[j] << "    "
+            << resultsMatrix[i][j][0] << "    " << resultsMatrix[i][j][1] << endl;
+    
     
 
 
@@ -230,7 +249,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     //Solution *Init = new Solution(100);
     Solution Init(100);
     int multiplier = multi;
-    Init.K_Solution_Gen(25);
+    Init.K_Solution_Gen(50);
     //Init.generate();
 
     Init.setMulti(multiplier);
