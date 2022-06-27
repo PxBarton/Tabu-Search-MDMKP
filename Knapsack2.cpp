@@ -41,11 +41,11 @@ int main()
 
     // a set of five files for an MDMKP problem
     // two files for the LHS, two for the RHS, one for the objective function coeff's
-    string file1 = "MDMKPcase3&6_all/MDMKP_8_3/LHSknapsack_8_3.csv";
-    string file2 = "MDMKPcase3&6_all/MDMKP_8_3/LHSdemand_8_3.csv";
-    string file3 = "MDMKPcase3&6_all/MDMKP_8_3/RHSknapsack_8_3.csv";
-    string file4 = "MDMKPcase3&6_all/MDMKP_8_3/RHSdemand_8_3.csv";
-    string file5 = "MDMKPcase3&6_all/MDMKP_8_3/ObjCoeffs_8_3.csv";
+    string file1 = "MDMKPcase3&6_all/MDMKP_15_6/LHSknapsack_15_6.csv";
+    string file2 = "MDMKPcase3&6_all/MDMKP_15_6/LHSdemand_15_6.csv";
+    string file3 = "MDMKPcase3&6_all/MDMKP_15_6/RHSknapsack_15_6.csv";
+    string file4 = "MDMKPcase3&6_all/MDMKP_15_6/RHSdemand_15_6.csv";
+    string file5 = "MDMKPcase3&6_all/MDMKP_15_6/ObjCoeffs_15_6.csv";
     
     /*
     string file1 = "MDMKP/LHS_k.txt";
@@ -151,10 +151,12 @@ int main()
     // populate with zeros
     vector<vector<vector<int>>> resultsMatrix;
     vector<int> initResults = { 0, 0 };
+
     // create a column of 2-tuples
     vector<vector<int>> initMatrixCol;
     for (int row = 0; row < iterCounts.size(); row++)
         initMatrixCol.push_back(initResults);
+
     // fill matrix with columns of 2-tuples
     for (int col = 0; col < multipliers.size(); col++)
         resultsMatrix.push_back(initMatrixCol);
@@ -264,7 +266,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     tabuList.insertTabu(bestSol);
     tabuList.insertTabu(nextSol);
     int count = 0;
-    cout << "here" << endl;
+    //cout << "here" << endl;
 
     while (count < iterations) {
         //Solution newSol = init;
