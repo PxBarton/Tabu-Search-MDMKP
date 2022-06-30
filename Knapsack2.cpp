@@ -144,8 +144,8 @@ int main()
     // automating runs of tabu search algorithm
     // experimenting with multiplier values and number of iterations
 
-    vector<int> multipliers = {10, 100, 1000};
-    vector<int> iterCounts = {500, 1000};
+    vector<int> multipliers = {10, 100};
+    vector<int> iterCounts = {500};
     
     // create a matrix of 2-tuples
     // populate with zeros
@@ -251,7 +251,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
     //Solution *Init = new Solution(100);
     Solution Init(100);
     int multiplier = multi;
-    Init.K_Solution_Gen(50);
+    Init.K_Solution_Gen(95);
     //Init.generate();
 
     Init.setMulti(multiplier);
@@ -288,7 +288,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
                     cout << "feasible" << endl;
                 }
                 tabuList.insertTabu(newSol);
-                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << " " << endl;
+                cout << "improve  " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << "     " << newSol.calcK() << endl;
             }
             else {
                 nextSol = newSol;
@@ -305,7 +305,7 @@ vector<int> tabuSearch(ProblemCoefficients& coeff, TabuList& tabuList, vector<ve
                         bestFeas = newSol;
                     cout << "feasible" << endl;
                 }
-                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << endl;
+                cout << "no improve " << newSol.getZ() << "  " << newSol.getP() << "  " << newSol.evalFit(coeff) << "    " << newSol.calcK() << endl;
             }
             else {
                 nextSol = newSol; 
